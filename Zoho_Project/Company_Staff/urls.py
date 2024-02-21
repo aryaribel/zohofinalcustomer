@@ -38,6 +38,24 @@ urlpatterns = [
     
     # -------------------------------Zoho Modules section--------------------------------
     
+    #-----------------------Customer---------------------------#
+    #------------Arya E.R---------------#
+
+    path('customer',views.customer,name='customer'),
+    path('view_customer_list',views.view_customer_list,name='view_customer_list'),
+    path('check_customer_phonenumber_exist',views.check_customer_phonenumber_exist,name='check_customer_phonenumber_exist'),
+    path('check_customer_work_phone_exist',views.check_customer_work_phone_exist,name='check_customer_work_phone_exist'),
+    path('check_customer_email_exist',views.check_customer_email_exist,name='check_customer_email_exist'),
+    path('check_customer_term_exist',views.check_customer_term_exist,name='check_customer_term_exist'),
+    path('customer_payment_terms_add',views.customer_payment_terms_add,name='customer_payment_terms_add'),
+    path('customer_check_pan',views.customer_check_pan,name='customer_check_pan'),
+    path('add_customer/',views.add_customer,name='add_customer'),
+    path('customer_check_gst',views.customer_check_gst,name='customer_check_gst'),
+    path('sort_customer_by_name',views.sort_customer_by_name,name='sort_customer_by_name'),
+    path('sort_customer_by_amount',views.sort_customer_by_amount,name='sort_customer_by_amount'),
+    path('view_customer_active',views.view_customer_active,name='view_customer_active'),
+    path('view_customer_inactive',views.view_customer_inactive,name='view_customer_inactive'),
+    path('import_customer_excel',views.import_customer_excel,name='import_customer_excel'),
     
   
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),

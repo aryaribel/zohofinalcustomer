@@ -26,6 +26,7 @@ from django.db.models import Q
 from django.http import JsonResponse,HttpResponse,HttpResponseRedirect
 
 # Create your views here.
+from decimal import Decimal
 
 
 
@@ -676,5 +677,456 @@ def company_gsttype_change(request):
 
 #--------------Customer-----------------#
 #-------------------Arya E.R----------------------#
-     
-         
+
+def customer(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+    
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+        
+        comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
+        if log_details.user_type=='Staff':
+
+            return render(request,'zohomodules/customer/create_customer.html',{'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details}) 
+        else:
+            return render(request,'zohomodules/customer/create_customer.html',{'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details}) 
+    else:
+        return redirect('/')  
+
+def view_customer_list(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+
+        allmodules= ZohoModules.objects.get(company=dash_details,status='New')  
+
+        data=Customer.objects.filter(company=dash_details)
+
+        
+
+        return render(request,'zohomodules/customer/customer_list.html',{'details':dash_details,'allmodules': allmodules,'data':data,'log_details':log_details}) 
+
+
+    else:
+        return redirect('/')
+    
+
+def add_customer(request):
+   
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+
+        
+
+       
+        if request.method=="POST":
+            vendor_data=Customer()
+            vendor_data.login_details=log_details
+            vendor_data.company=dash_details
+            vendor_data.customer_type = request.POST.get('type')
+
+            vendor_data.title = request.POST.get('salutation')
+            vendor_data.first_name=request.POST['first_name']
+            vendor_data.last_name=request.POST['last_name']
+            vendor_data.company_name=request.POST['company_name']
+            vendor_data.customer_display_name=request.POST['v_display_name']
+            vendor_data.customer_email=request.POST['vendor_email']
+            vendor_data.customer_phone=request.POST['w_phone']
+            vendor_data.customer_mobile=request.POST['m_phone']
+            vendor_data.skype=request.POST['skype_number']
+            vendor_data.designation=request.POST['designation']
+            vendor_data.department=request.POST['department']
+            vendor_data.website=request.POST['website']
+            vendor_data.GST_treatement=request.POST['gst']
+            vendor_data.customer_status="Active"
+            vendor_data.remarks=request.POST['remark']
+            vendor_data.current_balance=request.POST['opening_bal']
+
+            x=request.POST['gst']
+            if x=="Unregistered Business-not Registered under GST":
+                vendor_data.PAN_number=request.POST['pan_number']
+                vendor_data.GST_number="null"
+            else:
+                vendor_data.GST_number=request.POST['gst_number']
+                vendor_data.PAN_number=request.POST['pan_number']
+
+            vendor_data.place_of_supply=request.POST['source_supply']
+            vendor_data.currency=request.POST['currency']
+            print(vendor_data.currency)
+            op_type=request.POST.get('op_type')
+            if op_type is not None:
+                vendor_data.opening_balance_type=op_type
+            else:
+                vendor_data.opening_balance_type='Opening Balance not selected'
+    
+            vendor_data.opening_balance=request.POST['opening_bal']
+            vendor_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
+            vendor_data.price_list=request.POST['plst']
+            vendor_data.portal_language=request.POST['plang']
+            vendor_data.facebook=request.POST['fbk']
+            vendor_data.twitter=request.POST['twtr']
+
+
+
+
+           
+            vendor_data.billing_attention=request.POST['battention']
+            vendor_data.billing_country=request.POST['bcountry']
+            vendor_data.billing_address=request.POST['baddress']
+            vendor_data.billing_city=request.POST['bcity']
+            vendor_data.billing_state=request.POST['bstate']
+            vendor_data.billing_pincode=request.POST['bzip']
+            vendor_data.billing_mobile=request.POST['bphone']
+            vendor_data.billing_fax=request.POST['bfax']
+            vendor_data.shipping_attention=request.POST['sattention']
+            vendor_data.shipping_country=request.POST['s_country']
+            vendor_data.shipping_address=request.POST['saddress']
+            vendor_data.shipping_city=request.POST['scity']
+            vendor_data.shipping_state=request.POST['sstate']
+            vendor_data.shipping_pincode=request.POST['szip']
+            vendor_data.shipping_mobile=request.POST['sphone']
+            vendor_data.shipping_fax=request.POST['sfax']
+            vendor_data.save()
+           # ................ Adding to History table...........................
+            
+            vendor_history_obj=CustomerHistory()
+            vendor_history_obj.company=dash_details
+            vendor_history_obj.login_details=log_details
+            vendor_history_obj.customer=vendor_data
+            vendor_history_obj.date=date.today()
+            vendor_history_obj.action='Completed'
+            vendor_history_obj.save()
+
+    # .......................................................adding to remaks table.....................
+            vdata=Customer.objects.get(id=vendor_data.id)
+            vendor=vdata
+            rdata=Customer_remarks_table()
+            rdata.remarks=request.POST['remark']
+            rdata.company=dash_details
+            rdata.customer=vdata
+            rdata.save()
+
+
+     #...........................adding multiple rows of table to model  ........................................................  
+        
+            title =request.POST.getlist('salutation[]')
+            first_name =request.POST.getlist('first_name[]')
+            last_name =request.POST.getlist('last_name[]')
+            email =request.POST.getlist('email[]')
+            work_phone =request.POST.getlist('wphone[]')
+            mobile =request.POST.getlist('mobile[]')
+            skype_name_number =request.POST.getlist('skype[]')
+            designation =request.POST.getlist('designation[]')
+            department =request.POST.getlist('department[]') 
+            vdata=Customer.objects.get(id=vendor_data.id)
+            vendor=vdata
+           
+            if title != ['Select']:
+                if len(title)==len(first_name)==len(last_name)==len(email)==len(work_phone)==len(mobile)==len(skype_name_number)==len(designation)==len(department):
+                    mapped2=zip(title,first_name,last_name,email,work_phone,mobile,skype_name_number,designation,department)
+                    mapped2=list(mapped2)
+                    print(mapped2)
+                    for ele in mapped2:
+                        created = CustomerContactPersons.objects.get_or_create(title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
+                                work_phone=ele[4],mobile=ele[5],skype_name_number=ele[6],designation=ele[7],department=ele[8],company=dash_details,vendor=vendor)
+                
+        
+            messages.success(request, 'Data saved successfully!')   
+
+            return redirect('view_customer_list')
+        
+        else:
+            messages.error(request, 'Some error occurred !')   
+
+            return redirect('view_customer_list')
+
+
+
+
+
+def check_customer_phonenumber_exist(request):
+    if request.method == 'GET':
+       mPhone = request.GET.get('m_Phone', None)
+
+       if mPhone:
+          
+            exists = Customer.objects.filter(
+                    mobile=mPhone
+                ).exists()
+            return JsonResponse({'exists': exists})          
+    else:
+        return JsonResponse({'exists': False}) 
+
+def check_customer_work_phone_exist(request):
+    if request.method == 'GET':
+       wPhone = request.GET.get('w_Phone', None)
+
+       if wPhone:
+          
+            exists = Customer.objects.filter(
+                    phone=wPhone
+                ).exists()
+            return JsonResponse({'exists': exists})          
+    else:
+        return JsonResponse({'exists': False})   
+
+def check_customer_email_exist(request):
+    if request.method == 'GET':
+       vendoremail = request.GET.get('vendor_email', None)
+
+       if vendoremail:
+          
+            exists = Customer.objects.filter(
+                    vendor_email=vendoremail
+                ).exists()
+            return JsonResponse({'exists': exists})          
+    else:
+        return JsonResponse({'exists': False}) 
+
+def customer_payment_terms_add(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)        
+        if request.method == 'POST':
+            terms = request.POST.get('name')
+            day = request.POST.get('days')
+            normalized_data = terms.replace(" ", "")
+            pay_tm = add_space_before_first_digit(normalized_data)
+            ptr = Company_Payment_Term(term_name=pay_tm, days=day, company=dash_details)
+            ptr.save()
+            payterms_obj = Company_Payment_Term.objects.filter(company=dash_details).values('id', 'term_name')
+
+
+            payment_list = [{'id': pay_terms['id'], 'name': pay_terms['term_name']} for pay_terms in payterms_obj]
+            response_data = {
+            "message": "success",
+            'payment_list':payment_list,
+            }
+            return JsonResponse(response_data)
+
+        else:
+            return JsonResponse({'error': 'Invalid request'}, status=400)   
+            
+def add_space_before_first_digit(data):
+    for index, char in enumerate(data):
+        if char.isdigit():
+            return data[:index] + ' ' + data[index:]
+    return data
+
+
+
+
+
+def check_customer_term_exist(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+    
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+
+    if request.method == 'GET':
+       term_name = request.GET.get('term_name', None)
+       if term_name:
+            normalized_data = term_name.replace(" ", "")
+            term_name_processed = add_space_before_first_digit(normalized_data)
+            exists = Company_Payment_Term.objects.filter(
+                    term_name=term_name_processed,
+                    company=dash_details
+                ).exists()
+            return JsonResponse({'exists': exists})          
+    else:
+        return JsonResponse({'exists': False})    
+
+def customer_check_pan(request):
+    if request.method == 'POST':
+        panNumber = request.POST.get('panNumber')
+        pan_exists = Customer.objects.filter(pan_number=panNumber).exists()
+
+        if pan_exists:
+            return JsonResponse({'status': 'exists'})
+        else:
+            return JsonResponse({'status': 'not_exists'})
+    else:
+        return JsonResponse({'error': 'Invalid request'})  
+
+def customer_check_gst(request):
+    if request.method == 'POST':
+        gstNumber = request.POST.get('gstNumber')
+        gst_exists = Customer.objects.filter(gst_number=gstNumber).exists()
+       
+        if gst_exists:
+            return JsonResponse({'status': 'exists'})
+        else:
+            return JsonResponse({'status': 'not_exists'})
+    else:
+        return JsonResponse({'error': 'Invalid request'}) 
+
+def sort_customer_by_name(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
+  
+        data=Customer.objects.filter(login_details=log_details).order_by('first_name')
+        return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
+    else:
+            return redirect('/')    
+
+def sort_customer_by_amount(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
+   
+        data=Customer.objects.filter(login_details=log_details).order_by('opening_balance')
+        return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
+    else:
+         return redirect('/')   
+
+
+def view_customer_active(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
+   
+        data=Customer.objects.filter(login_details=log_details,vendor_status='Active').order_by('-id')
+        return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
+    else:
+         return redirect('/') 
+
+    
+    
+def view_customer_inactive(request):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
+   
+        data=Customer.objects.filter(login_details=log_details,vendor_status='Inactive').order_by('-id')
+        return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
+    else:
+         return redirect('/') 
+
+
+def import_customer_excel(request):
+   if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        if request.method == 'POST' :
+       
+            if 'empfile' in request.FILES:
+                excel_bill = request.FILES['empfile']
+                excel_b = load_workbook(excel_bill)
+                eb = excel_b['Sheet1']
+                for row_number1 in range(2, eb.max_row + 1):
+                            
+                    vendorsheet = [eb.cell(row=row_number1, column=col_num).value for col_num in range(1, eb.max_column + 1)]
+                    comp_term=vendorsheet[16]
+                    pay_tm = add_space_before_first_digit(comp_term)
+                    try:
+                        com_term_obj=Company_Payment_Term.objects.get(company=dash_details,term_name=pay_tm)
+                    except Company_Payment_Term.DoesNotExist:
+                        com_term_obj= None
+                    opn_blc_str = vendorsheet[15]  # Assuming vendorsheet[15] is a string representing a decimal
+                    opn_blc = Decimal(opn_blc_str)
+                    Vendor_object=Customer(title=vendorsheet[0],first_name=vendorsheet[1],last_name=vendorsheet[2],company_name=vendorsheet[3],vendor_email=vendorsheet[4],phone=vendorsheet[5],mobile=vendorsheet[6],skype_name_number=vendorsheet[7],designation=vendorsheet[8],department=vendorsheet[9],website=vendorsheet[10],
+                                         gst_treatment=vendorsheet[11],source_of_supply=vendorsheet[12],currency=vendorsheet[13],opening_balance_type=vendorsheet[14],
+                                         opening_balance=opn_blc,payment_term=com_term_obj,billing_attention=vendorsheet[17],billing_address=vendorsheet[18],
+                                         billing_city=vendorsheet[19],billing_state=vendorsheet[20],billing_country=vendorsheet[21],billing_pin_code=vendorsheet[22],
+                                         billing_phone=vendorsheet[23],billing_fax=vendorsheet[24],shipping_attention=vendorsheet[25],shipping_address=vendorsheet[26],shipping_city=vendorsheet[27],
+                                         shipping_state=vendorsheet[28],shipping_country=vendorsheet[29],shipping_pin_code=vendorsheet[30],
+                                         shipping_phone=vendorsheet[31], shipping_fax=vendorsheet[32], remarks=vendorsheet[33],vendor_status="Active",company=dash_details,login_details=log_details)
+                    Vendor_object.save()
+
+    
+                   
+                messages.warning(request,'file imported')
+                return redirect('view_customer_list')    
+
+    
+            messages.error(request,'File upload Failed!11')
+            return redirect('view_customer_list')
+        else:
+            messages.error(request,'File upload Failed!11')
+            return redirect('view_customer_list')                                   

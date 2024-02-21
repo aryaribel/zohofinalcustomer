@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+ <!-- Pagination Styling -->
+ <style>
+  .g-1
+  {
+    gap: 0.575rem;
+  }
+  #myTable thead tr th{
+    font-size: 0.780rem;
+  }
+  #myTable tbody tr td{
+    font-size: 0.80rem;
+  }
+  .pagination
+  {
+    --bs-pagination-bg: #121210 !important;
+    margin-top: 1rem;
+  }
+  .pagination-box
+  {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+   
+  }
+  .pagination-ul li a
+  {
+      border: none !important;
+      color: #c9c9c9;
+      font-size: 13px;
+  }
+  .pagination-ul li:hover a{
+      background:  #fad106;
+      color: #f8f7f7;
+  }
+  
+
+
+  .top-section
+  {
+      justify-content: space-between;
+      align-items: center;
+  }
+  ul li{
+      list-style: none;
+  }
+  @media(max-width:768px)
+  {
+    .pagination-box
+  {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+   
+  }
+  }
+</style>
+
+<div class="body-wrapper">
+  <div class="container-fluid">
+      <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            {% if log_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+            {% if log_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+             <li class="breadcrumb-item"><a href="{% url 'view_customer_list' %}" class="text-warning-emphasis">Customer list</a></li>
+             <li class="breadcrumb-item" aria-current="page">Over view</li>
+          </ol>
+      </nav>
+      <div class="row mt-5">
+          <div class="col-md-12 col-sm-12 col-lg-12 flex-column">
+              <div class="card mb-3 bg-black shadow p-3 mb-5 rounded">
+                <div class="row mt-4">
+                  <div class="col-7 col-sm-7 col-lg-6"><a class="text-white" style="font-size: 1.5rem;">All Customers</a></div>
+                  <div class="row mt-2">
+                    <div class="col-md-4 col-lg-4 col-sm-10">
+                      <input type="text" id="search" class="form-control bg-light text-dark" placeholder="Search.." autocomplete="off">
+                    </div>
+                    <div class="col-md-2 col-lg-2 col-sm-2">
+                      <div class="dropdown">
+                        <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
+                          <i  class="fas fa-sort m-1"></i>
+                        </a>
+                       
+                        <div class="dropdown-menu m-1">
+                          <a class="dropdown-item" href="{% url 'view_customer_list' %}">All</a>
+                          <a class="dropdown-item" href="{% url 'sort_customer_by_name' %}">Name</a>
+                          <a class="dropdown-item" href="{% url 'sort_customer_by_amount' %}">Balance</a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 col-md-6  ">
+                      <div class="d-flex justify-content-end g-1">
+
+                        <a onclick="ExportToExcel()" class="btn text-center pt-2 btn-outline-warning " >
+                          <i class='fas fa-file-export' style='font-size:18px'></i> <span > Export</span>
+                        </a>
+                        <a data-toggle="modal" data-target="#importmodal" class="btn text-center pt-2 btn-outline-warning" onclick="sampleexcel()">
+                          <i class="fas fa-file-import" style='font-size:18px'></i> <span style="margin-top: 3px;"> Import</span>
+                        </a>
+                        <div class="dropdown">
+                        <a class="btn text-center  pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
+                          <i class="fa fa-filter mt-1"></i>
+                        </a>
+
+                        <div class="dropdown-menu m-1 ">
+                          <a class="dropdown-item" href="{% url 'view_customer_list' %}">All</a>
+                          <a class="dropdown-item" href="{% url 'view_customer_active' %}">Active</a>
+                          <a class="dropdown-item" href="{% url 'view_customer_inactive' %}">Inactive</a>
+                        </div>
+                        </div>
+                        <a  class="btn btn-outline-warning text-right px-3 py-2 flex-sm-row" role="button"  href="{% url 'customer' %}">
+                          <i class="fa fa-plus fs-4" ><span> New</span></i>
+                        </a>
+  
+
+                      </div>
+
+                      
+                 
+                    
+
+                      
+                    </div>
+                  </div>
+                </div>
+       
+
+       
+        <div class="row mt-2">
+<style>
+  .example::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.example {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+</style>
+        
+          <div class="table-responsive example">
+            <table class="table  text-white" id="myTable" >
+              <thead>
+                <tr>
+                  <th style="text-align: center;">#</th>
+
+                  <th style="text-align: center;">NAME</th>
+                  
+                  <!-- <th style="text-align: center;">PHONE</th> -->
+                  <th style="text-align: center;">EMAIL</th>
+                  <th style="text-align: center;">GST TREATMENT</th>
+                  <th style="text-align: center;">GST NUMBER</th>
+                  <th style="text-align: center;">OPENING BALANCE</th>
+                  <th style="text-align: center;">STATUS</th>
+
+                  <th style="text-align: center;">BALANCE</th>
+                  <!-- <th style="text-align: center;">DELETE</th> -->
+
+                </tr>
+               
+              </thead>
+             
+              <tbody>
+                {% for v in data %}
+       
+                <tr id="over" class="clickable-row" data-href="">
+                  <td style="text-align: center;">{{forloop.counter}}</td>
+
+                  <td>{{v.first_name}} {{v.last_name}}</td>
+                  <!-- <td>{{v.phone}}</td> -->
+
+                  <td>{{v.customer_email}}</td>
+
+                  <td ><textarea class="bg-transparent text-white border-0" name="" id="" cols="45" rows="2">{{v.GST_treatement}}</textarea></td>
+                  <td>{{v.GST_number}}</td>
+                 
+                  <td> {% if v.opening_balance_type == 'credit' %}-{{v.opening_balance}}
+                      {% else %}
+                      {{v.opening_balance}}
+                      {% endif %}
+
+                  </td>
+                  
+                  <td>{{v.customer_status}}</td>
+                 
+                  <td>
+                    {{v.current_balance}}
+                  </td>
+
+  
+                 
+                </tr>
+                {% endfor %}
+              </tbody>
+
+            </table>
+
+            
+          </div>
+          
+        </div>
+       
+        <div class="row" hidden>
+          <table id="employeemodeltable">
+            <thead>
+                <th>Customer Type</th>
+              <th>Title</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Company Name</th>
+             <th>Email</th>
+             <th>Phone</th>
+             <th>Mobile</th>
+             <th>Skype</th>
+             <th>Designation</th>
+             <th>Department</th>
+              <th>Website</th>
+              <th>GST TREATMENT</th>
+              <th>Source of supply</th>
+              <th>Tax Preference</th>
+              <th>Currency</th>
+              <th>opening balance type</th>
+              <th>opening balance</th>
+              <th>payment term</th>
+              <th>billing attention</th>
+              <th>billing address</th>
+              <th>billing city</th>
+              <th>billing state</th>
+              <th>billing country</th>
+              <th>billing pin code</th>
+              <th>billing phone</th>
+              <th>billing fax</th>
+              <th>shipping attention</th>
+              <th>shipping address</th>
+              <th>shipping city</th>
+              <th>shipping state</th>
+              <th>shipping country</th>
+              <th>shipping pin code</th>
+              <th>shipping phone</th>
+              <th>shipping fax</th>
+              <th>Remarks</th>
+             
+            </thead>
+            <tbody>
+              
+             
+            </tbody>
+          </table>
+        </div>
+
+
+      </div>
+</div>
+      </div>
+      </div>
+
+      
+      <div class="modal fade" id="importmodal" style="margin-top: 7vh;">
+        <div class="modal-dialog ">
+          <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+            <div class="modal-header">
+              <h5 class="modal-title" id="excelModalLabel">Upload File
+              <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" style="background: rgb(32, 35, 37);">
+              <div class="card">
+                <form action="{% url 'import_customer_excel' %}" method="post" class="needs-validation" enctype="multipart/form-data"  id="excelForm">
+                  {% csrf_token %}
+                  <div class="form-group mt-3" style="margin-left: 2vh;">
+                    <label for="file" style="font-size: medium;">Choose Excel File for Customers - </label> <br><br>
+                    <input type="file" class="form-control-file" id="empfile" name="empfile" accept=".xls,.xlsx"><br>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn text-center pt-2 btn-outline-warning" onclick="" >Upload</button>
+                    <button type="button" class="btn text-center pt-2 btn-outline-warning" data-dismiss="modal">Close</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>  
+      </div> 
+      
+    
+    
+</div>
+  </div>
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6" ></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Check if there's a success message and trigger SweetAlert -->
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                swal.fire({  
+                  title: "Good job!",  
+                  text: '{{ message }}',  
+                  icon: "success",  
+                  showConfirmButton: false,
+                  timer: 2900
+                });  
+                {% elif message.tags == 'error' %}
+                Swal.fire({
+                    icon: 'error',
+                    title: "Ooops Error !",  
+                    text: '{{ message }}',  
+                    showConfirmButton: false,
+                    timer: 2900
+                });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </script>
+
+
+  <script>
+    $(document).ready(function () {
+      $("#search").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#myTable tr").filter(function () {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+  </script>
+  
+  <script>
+    // Add click event listener to all rows with class "clickable-row"
+    const rows = document.querySelectorAll('.clickable-row');
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        // Get the URL from the "data-href" attribute
+        const url = row.getAttribute('data-href');
+        // Navigate to the URL
+        window.location.href = url;
+      });
+    });
+  </script>
+ 
+  <script>
+    function ExportToExcel() {
+      console.log("myTable");
+      $('in1').prop
+      const table = document.getElementById('myTable'); // Replace 'myTable' with your table's ID
+      const wb = XLSX.utils.table_to_book(table);
+  
+      XLSX.writeFile(wb, 'customer_list.xlsx');
+  }
+  </script>
+  
+  <script>
+    function sampleexcel(){
+      const table1 = document.querySelector('#employeemodeltable');
+      const ws1 = XLSX.utils.table_to_sheet(table1);
+      const wb1 = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
+      XLSX.writeFile(wb1, 'customer list.xlsx');
+    }
+  </script>
+
+
+
+
+{% endblock %}
