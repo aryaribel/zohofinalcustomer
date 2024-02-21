@@ -1,0 +1,130 @@
+{% extends 'adminbase.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    table tr:hover {
+    background-color: rgba(255, 255, 255, 0.025);
+    }
+</style>
+
+  
+
+
+<div class="body-wrapper">
+  <div class="container-fluid">
+
+    <nav aria-label="breadcrumb ">
+      <ol class="breadcrumb pt-3">
+        <li class="breadcrumb-item"><a href="{% url 'trial_period_section' %}" class="text-warning-emphasis">Trial Period</a></li>
+        <li class="breadcrumb-item" aria-current="page">Clients</li>
+      </ol>
+    </nav>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <h6 class="text-white">Filter by</h6>
+            <select name="status-select" id="status-select" class="form-select bg-black text-white" style="border: 1px solid rgba(255, 255, 255, 0.3);">
+                <option value="" hidden>Active or Expired Trial Period</option>
+                <option value="Active">Active</option>
+                <option value="Expired">Expired</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="table-responsive">  
+            <h4 class="text-white mt-5 mb-3">Details</h4>
+            <table class="table" id="trial-period-table" style="background-color: black;">
+              <thead>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                  <th  style="color: white;">No</th>
+                  <th  style="color: white;">Company Name</th>
+                  <th  style="color: white;">Trial Period</th>
+                  <th  style="color: white;">Start Date</th>
+                  <th  style="color: white;">End Date</th>
+                  <th  style="color: white;">Interested in Continuing</th>
+                  <th  style="color: white;">Feedbacks</th>
+                 
+      
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in clients %}
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                  <td class="text-white">{{forloop.counter}}</td>
+                  <td> 
+                    {% if c.company.profile_pic %}
+                    <img width="35" height="35" class="rounded-circle" src="{{ c.company.profile_pic.url }}" alt="">
+                    {% else %}
+                    <img src="{% static 'registration_login/images/default.png' %}" alt="" width="35" height="35" class="rounded-circle">
+                    {% endif %}
+                    <a href="" class="text-light">{{c.company.company_name}}</a>
+                  </td>
+                  <td class="text-light">
+                    {% if c.is_active %}
+                    <h6 class="text-white mt-1"><span class="badge bg-warning text-black">Active <i class="fa fa-check-circle fa-sm"></i></span> </h6>
+                    {% else %}
+                    <h6 class="text-white mt-1"><span class="badge bg-warning text-black">Expired <i class="fa fa-times-circle fa-sm"></i></span> </h6>
+                    {% endif %}
+                  </td>
+                  <td class="text-light">{{c.start_date}}</td>
+                  <td class="text-light">{{c.end_date}}</td>
+                  <td>
+                    {% if c.interested_in_buying == 0 %}
+                    <h6 class="badge bg-warning mt-1 text-black">Undecided ?</h6>
+                    {% elif c.interested_in_buying == 1 %}
+                    <h6 class="badge bg-warning mt-1 text-black w-50">Yes <i class="fa fa-check-circle fa-sm"></i></h6>
+                    {% else %}
+                    <h6 class="badge bg-warning mt-1 text-black w-50">No <i class="fa fa-times-circle fa-sm"></i></h6>
+                    {% endif %}
+                  </td>
+                  {% if c.feedback %}
+                  <td class="text-light"><textarea cols="30" rows="2" class="bg-black text-white p-2 lh-lg" readonly>{{c.feedback}}</textarea></td>
+                  {% else %}
+                  <td class="text-white-50">No feedbacks given</td>
+                  {% endif %}
+                
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table> 
+        </div>
+      
+    </div>
+
+
+  </div>
+</div>
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+$(document).ready(function () {
+  // Add change event to distributor and status dropdowns
+  $('#status-select').change(filterTable);
+
+  function filterTable() {
+      
+    var statusFilter = $('#status-select').val();
+    
+    $('#trial-period-table tbody tr').each(function () {
+      var statusCell = $(this).find('td:nth-child(3)').text().trim();
+      var statusMatch = statusFilter === '' || statusCell.toLowerCase() === statusFilter.toLowerCase();
+
+      if (statusMatch) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  }
+});
+</script>
+
+
+{% endblock %}

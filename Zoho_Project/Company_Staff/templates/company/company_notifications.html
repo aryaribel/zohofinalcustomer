@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
+                <li class="breadcrumb-item" area-current="page">Notifications</li>
+            </ol>
+        </nav>
+
+        <div class="row row-cols-1 row-cols-md-1 g-4 mt-3">
+
+            <!-- Payment term overdue  of company-->
+            {% if payment_request == False %}
+
+            {% if details.payment_term %} 
+              
+            {% if days_remaining <= 20 and days_remaining > 0 %}
+            <div class="col">
+              <div class="card h-100 bg-black rounded-4 mb-0">
+                <div class="card-body">
+                    <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white font-monospace">Payment Term Ends in <span class="text-warning">{{days_remaining}} days</span></span></h4>
+                    <p class="card-text text-white-50 mt-1 font-monospace">
+                        Your current plan is expiring on {{details.End_date}}
+                        <span class=" ms-2 text-warning-emphasis"><a href="{% url 'company_profile' %}" class="text-warning-emphasis">click to renew</a></span>
+
+                    </p>
+                </div>
+              </div>
+            </div>
+
+            {% elif days_remaining == 0 %}
+            <div class="col">
+                <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white font-monospace">Payment Term Ends <span class="text-warning">Today</span></span></h4>
+                       
+                        <p class="card-text text-white-50 mt-1 font-monospace">
+                            Your current plan is expiring on Today
+                            <span class=" ms-2 text-warning-emphasis"><a href="{% url 'company_profile' %}" class="text-warning-emphasis">Click to renew</a></span>
+    
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {% elif days_remaining < 0  %}
+            <div class="col">
+                <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white font-monospace">Payment Terms <span class="text-warning">Overdue</span></span></h4>
+                
+                        <p class="card-text text-white-50 mt-1 font-monospace">
+                           No Active plan for your account
+                            <span class=" ms-2 text-warning-emphasis"><a href="{% url 'company_profile' %}" class="text-warning-emphasis">Click to renew</a></span>
+    
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- trial period overdue  of company-->
+            {% else %}
+            
+            {% if days_remaining <= 10  and  days_remaining > 0 %}
+            <div class="col">
+              <div class="card h-100 bg-black rounded-4 mb-0">
+                <div class="card-body">
+                    <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white font-monospace">Trial Period Ends in <span class="text-warning">{{days_remaining}} days</span></span></h4>
+                    <p class="card-text text-white-50 mt-1 font-monospace">
+                        Your current plan is expiring on {{details.End_date}}
+                        <span class=" ms-2 text-warning-emphasis"><a href="{% url 'company_profile' %}" class="text-warning-emphasis">click to renew</a></span>
+
+                    </p>
+                </div>
+              </div>
+            </div>
+
+            {% elif days_remaining == 0 %}
+            <div class="col">
+                <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white font-monospace">Trial Period Ends <span class="text-warning">Today</span></span></h4>
+                       
+                        <p class="card-text text-white-50 mt-1 font-monospace">
+                            Your current plan is expiring on Today
+                            <span class=" ms-2 text-warning-emphasis"><a href="{% url 'company_profile' %}" class="text-warning-emphasis">Click to renew</a></span>
+    
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {% elif days_remaining < 0  %}
+            <div class="col">
+                <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white font-monospace">Trial Period <span class="text-warning">Overdue</span></span></h4>
+                
+                        <p class="card-text text-white-50 mt-1 font-monospace">
+                           No Active plan for your account
+                            <span class=" ms-2 text-warning-emphasis"><a href="{% url 'company_profile' %}" class="text-warning-emphasis">Click to renew</a></span>
+    
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% endif %}
+
+            {% endif %}
+
+
+            <!-- notifications -->
+            {% for n in notifications %}
+            <div class="col">
+              <div class="card h-100 bg-black rounded-4 mb-0">
+                
+                <div class="card-body">
+                    <h4><i class="fas fa-bell fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white font-monospace">{{n.title}}</span></h4>
+                    <p class="card-text text-white-50 mt-1 font-monospace">
+                        {{n.message}}
+                        <span class=" ms-2 text-warning-emphasis"><a href="{% url 'company_message_read' n.id %}" class="text-warning-emphasis">remove</a></span>
+
+                    </p>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        
+
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}

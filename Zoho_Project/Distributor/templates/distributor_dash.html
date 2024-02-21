@@ -1,0 +1,133 @@
+{% extends 'distributorbase.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .bg-warning {
+      --bs-bg-opacity: .75;
+      background-color: rgba(var(--bs-warning-rgb), var(--bs-bg-opacity)) !important;
+  }
+  
+</style>
+
+<section >
+
+  <div class="body-wrapper h-100">
+    <div class="container-fluid" >
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb pt-3">
+          <li class="breadcrumb-item" aria-current="page">Dashboard</li>
+          
+        </ol>
+      </nav>
+    
+      <div class="row mt-5">
+        <div class="col-md-4">
+          <div class="card bg-black"  >
+           <div class="card-body">
+
+            <div class="row">
+              <div class="col-md-9 ">
+                <a href="{% url 'dist_clients' %}">
+                <h5 class="card-title mb-9  text-light">Clients</h5>
+              </a>
+                
+
+              </div>
+              <div class="col">
+                <a href="">
+                <i class="fa fa-users text-warning" style="font-size: 2em;"></i>
+              </a>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>      
+       
+       
+    </div>
+  </div>
+     
+</section>
+
+<script src="http://www.w3.org/2000/svg" src="https://www.gstatic.com/charts/loader.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+</script>
+
+<!-- Include your modal HTML structure here (hidden by default) -->
+{% if payment_request == False %}
+{% if alert_message %}
+<div class="modal" id="alertModal">
+  <div class="modal-dialog " >
+    <div class="modal-content" style="background-color: rgb(30,30,30);border: 1px solid rgba(255, 255, 255, 0.3);">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel"><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i><span class="text-white-50 ms-3 font-monospace">
+            {% if distributor_details.payment_term %}
+            Payment Term Ends in 
+            {% else %}
+            Trial Period Ends in 
+            {% endif %}
+
+            {% if days_left != 0 %}
+            <span class="text-warning">{{days_left}} days</span>
+            {% else %}
+            <span class="text-warning">Today</span>
+            {% endif %}
+
+        </h1>
+        <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {% if distributor_details.payment_term %}
+      <div class="modal-body">
+        <h5 class="text-white mt-1 font-monospace">Your  current plan is expiring on {{distributor_details.End_date}} </h5>
+        <div class="row mb-3">
+            <div class="col-md-4"></div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <a class="text-warning ms-5" href="{% url 'distributor_profile' %}"><small>click to renew</small></a>
+            </div>
+        </div>
+
+      </div>
+      
+      {% endif %}
+      
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- Include your JavaScript file or script here -->
+<script>
+  // Function to close the modal
+  function closeModal() {
+    var modal = document.getElementById('alertModal');
+    modal.style.display = 'none';
+  }
+
+  // Add event listener to close the modal when the close button is clicked
+  document.querySelector('.close').addEventListener('click', closeModal);
+
+  // Add event listener to close the modal when clicking outside the modal
+  window.addEventListener('click', function(event) {
+    var modal = document.getElementById('alertModal');
+    if (event.target == modal) {
+      closeModal();
+    }
+  });
+
+  // Add delay before showing the modal
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      var modal = document.getElementById('alertModal');
+      modal.style.display = 'block';
+    }, 1000); // Adjust the delay time in milliseconds (e.g., 2000 for 2 seconds)
+  });
+</script>
+
+
+
+{% endblock %}

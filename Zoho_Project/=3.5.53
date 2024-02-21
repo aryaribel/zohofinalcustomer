@@ -1,0 +1,25 @@
+Collecting reportlab
+  Using cached reportlab-4.0.9-py3-none-any.whl (1.9 MB)
+Collecting chardet
+  Using cached chardet-5.2.0-py3-none-any.whl (199 kB)
+Collecting pillow>=9.0.0
+  Using cached Pillow-9.5.0.tar.gz (50.5 MB)
+Building wheels for collected packages: pillow
+  Building wheel for pillow (setup.py): started
+  Building wheel for pillow (setup.py): finished with status 'error'
+  Running setup.py clean for pillow
+Failed to build pillow
+Installing collected packages: pillow, chardet, reportlab
+  Attempting uninstall: pillow
+    Found existing installation: Pillow 8.1.2
+    Uninstalling Pillow-8.1.2:
+      Successfully uninstalled Pillow-8.1.2
+    Running setup.py install for pillow: started
+    Running setup.py install for pillow: finished with status 'error'
+  Rolling back uninstall of Pillow
+  Moving to /home/wr58ngzdslmb/virtualenv/public_html/Zoho/Zoho_Project/3.7/lib64/python3.7/site-packages/PIL/
+   from /home/wr58ngzdslmb/virtualenv/public_html/Zoho/Zoho_Project/3.7/lib64/python3.7/site-packages/~IL
+  Moving to /home/wr58ngzdslmb/virtualenv/public_html/Zoho/Zoho_Project/3.7/lib64/python3.7/site-packages/Pillow-8.1.2.dist-info/
+   from /home/wr58ngzdslmb/virtualenv/public_html/Zoho/Zoho_Project/3.7/lib64/python3.7/site-packages/~illow-8.1.2.dist-info
+  Moving to /home/wr58ngzdslmb/virtualenv/public_html/Zoho/Zoho_Project/3.7/lib64/python3.7/site-packages/Pillow.libs/
+   from /home/wr58ngzdslmb/virtualenv/public_html/Zoho/Zoho_Project/3.7/lib64/python3.7/site-packages/~illow.libs

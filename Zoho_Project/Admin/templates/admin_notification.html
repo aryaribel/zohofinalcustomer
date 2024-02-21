@@ -1,0 +1,204 @@
+{% extends 'adminbase.html' %}
+{% block content %}
+{% load static %}
+
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+
+        <nav aria-label="breadcrumb ">
+            <ol class="breadcrumb pt-3">
+                <li class="breadcrumb-item"><a href="{% url 'admindash' %}" class="text-warning-emphasis">Dashboard</a></li>
+                <li class="breadcrumb-item" area-current="page">Notifications</li>
+            </ol>
+        </nav>
+        
+
+        <!-- All notifications -->
+       
+        <div class="row ">
+
+            <div class="row row-cols-1 row-cols-md-1 g-3">
+                <!-- overdue notification of payment terms, trial period -->
+
+                {% for d in distributor %}
+
+                <!-- Payment term overdue  of distributors-->
+                
+                {% if d.days_remaining <= 20 and d.days_remaining > 0 %}
+                <div class="col">
+                  <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Term Ends in <span class="text-warning">{{d.days_remaining}} days</span></span></h4>
+                        <h4 class="text-light mt-3 font-monospace">{{d.login_details.first_name}} {{d.login_details.last_name}}</h4>
+                        <p class="text-white-50 font-monospace">The current plan for {{d.login_details.first_name}} {{d.login_details.last_name}}  (distributor)  is expiring on {{d.End_date}}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {% elif d.days_remaining == 0 %}
+                <div class="col">
+                    <div class="card h-100 bg-black rounded-4 mb-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Term Ends <span class="text-warning">Today</span></span></h4>
+                            <h4 class="text-light mt-3 font-monospace">{{d.login_details.first_name}} {{d.login_details.last_name}}</h4>
+                            <p class="text-white-50 font-monospace">The current plan for {{d.login_details.first_name}} {{d.login_details.last_name}} (distributor) is expiring Today</p>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif d.days_remaining < 0  %}
+                <div class="col">
+                    <div class="card h-100 bg-black rounded-4 mb-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Terms <span class="text-warning">Overdue</span></span></h4>
+                            <h4 class="text-light mt-3 font-monospace">{{d.login_details.first_name}} {{d.login_details.last_name}} </h4>
+                            <p class="text-white-50 font-monospace">No active plan for {{d.login_details.first_name}} {{d.login_details.last_name}} (distributor) </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                
+                {% endfor %}
+
+                
+
+
+                {% for c in companies %} 
+
+                <!-- Payment term overdue of clients -->
+                {% if c.payment_term %}
+
+                {% if c.days_remaining <= 20 and c.days_remaining > 0 %}
+                <div class="col">
+                  <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Term Ends in <span class="text-warning">{{c.days_remaining}} days</span></span></h4>
+                        <h4 class="text-light mt-3 font-monospace">{{c.company_name}} </h4>
+                        <p class="text-white-50 font-monospace">The current payment term  plan for {{c.company_name}} (client) is expiring on {{c.End_date}}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {% elif c.days_remaining == 0 %}
+                <div class="col">
+                    <div class="card h-100 bg-black rounded-4 mb-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Term Ends <span class="text-warning">Today</span></span></h4>
+                            <h4 class="text-light mt-3 font-monospace">{{c.company_name}} </h4>
+                            <p class="text-white-50 font-monospace">The current payment term  plan for {{c.company_name}}  (client) is expiring Today</p>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif c.days_remaining < 0 %}
+                <div class="col">
+                    <div class="card h-100 bg-black rounded-4 mb-0">
+                        <div class="card-body">
+                            <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Terms <span class="text-warning">Overdue</span></span></h4>
+                            <h4 class="text-light mt-3 font-monospace">{{c.company_name}} </h4>
+                            <p class="text-white-50 font-monospace">No active plan for {{c.company_name}}  (client)</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+
+                <!-- trial period overdue  of clients-->
+                {% else %}
+                {% if c.days_remaining <= 10 and c.days_remaining > 0 %}
+                <div class="col">
+                  <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i><span class="h5 ms-2 text-white-50 font-monospace">Trial Period Ends in <span class="text-warning ms-1">{{c.days_remaining}} days</span></span></h4>
+                        <h4 class="text-light mt-3 font-monospace">{{c.company_name}} </h4>
+                        <p class="text-white-50 font-monospace">The Trial period of {{c.company_name}}  (client) is expiring on {{c.End_date}} </p>
+                    </div>
+                  </div>
+                </div>
+                
+
+                {% elif c.days_remaining == 0 %}
+                <div class="col">
+                    <div class="card h-100 bg-black rounded-4 mb-0">
+                      <div class="card-body">
+                          <h4><i class="fas fa-exclamation-triangle fa-lg text-warning  ms-1"></i><span class="h5 ms-2 text-white-50 font-monospace">Trial Period Ends <span class="text-warning ms-1">Today</span></span></h4>
+                          <h4 class="text-light mt-3 font-monospace">{{c.company_name}} </h4>
+                          <p class="text-white-50 font-monospace">The Trial period of {{c.company_name}}  (client) is expiring  Today </p>
+                      </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                {% endif %}
+
+                {% endfor %}
+            </div>
+            
+            <div class="row row-cols-1 row-cols-md-3 g-3">
+                <!-- payment term extension notifications of distributor and direct clients -->
+                {% for p in pterm_updation %}
+
+                {% if p.distributor %}
+                <div class="col">
+                    <div class="card h-100 bg-black rounded-4 mb-0">
+                        <div class="card-body">
+                            <h4><i class="fa fa-rupee-sign fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Term Extension</span></h4>
+                            <h4 class="text-white mt-3 font-monospace">{{ p.distributor.login_details.first_name }} {{ p.distributor.login_details.last_name }}</h4>
+                            <p class="text-white-50 font-monospace">{{ p.distributor.login_details.first_name }} (distributor) want to subscribe a new plan</p>
+                            <a class="text-warning-emphasis" href="{% url 'distribtor_paymentterm_updation_details' p.id %}">View More</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if p.company %}
+                {% if p.company.reg_action == 'self' %}
+                <div class="col">
+                    <div class="card h-100 bg-black rounded-4 mb-0">
+                        <div class="card-body">
+                            <h4><i class="fa fa-rupee-sign fa-lg text-warning  ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Payment Term Extension</span></h4>
+                            <h4 class="text-white mt-3 font-monospace">{{ p.company.company_name }}</h4>
+                            <p class="text-white-50 font-monospace">{{ p.company.company_name }} (client) want to subscribe a new plan.</p>
+                            <a class="text-warning-emphasis" href="{% url 'client_paymentterm_updation_details' p.id %}">View More</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+
+                {% endfor %}
+
+                <!-- module updations notifications of direct clients-->
+                {% for d in data %}
+                {% if d.company.reg_action == 'self' %}
+                <div class="col">
+                <div class="card h-100 bg-black rounded-4 mb-0">
+                    <div class="card-body">
+                        <h4><i class="fas fa-cogs fa-lg text-warning ms-1"></i> <span class="h5 ms-2 text-white-50 font-monospace">Module Updation</span></h4>
+                        <h4 class="text-white mt-3 font-monospace">{{ d.company.company_name }}</h4>
+                        <p class="text-white-50 font-monospace">{{ d.company.company_name }} want to update current modules.</p>
+                        <a class="text-warning-emphasis" href="{% url 'module_updation_details' d.id %}">View More</a>
+                    </div>
+                </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                
+                
+               
+            
+            </div>
+    
+        </div>
+
+
+    
+    </div>
+</div>   
+    
+    
+
+{% endblock  %}

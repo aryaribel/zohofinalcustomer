@@ -1,0 +1,150 @@
+{% extends 'adminbase.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  table tr:hover {
+    background-color: rgba(255, 255, 255, 0.025);
+  }
+</style>
+
+<div class="body-wrapper">
+  <div class="container-fluid" >
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb pt-3">
+          <li class="breadcrumb-item"><a href="{% url 'admindash' %}" class="text-warning-emphasis">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'admin_distributors' %}" class="text-warning-emphasis">Distributors</a></li>
+          <li class="breadcrumb-item" aria-current="page">Clients Under</li>
+        </ol>
+    </nav>
+
+    <div class="row mt-5">
+      <div class="col-md-12">
+        <div class="card mb-3 bg-black h-100" style="max-width: 100%;">
+          <div class="row g-0 mt-3">
+            <div class="col-md-4">
+              <div class="card-body">
+                  <h5 class="text-white">Select a <span class="text-warning-emphasis fw-bolder">Distributor</span></h5>
+                  <select class="form-select bg-black text-white mt-3" name="distributor" id="distributor-select">
+                      <option value="" hidden>Select</option>
+                      {% for distributor in distributors %}
+                      <option value="{{distributor.id}}">{{distributor.login_details.first_name}} {{distributor.login_details.last_name}}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-0 mt-lg-5" id="clienttable" style="display: none;">
+      
+            <div class="col-md-12">
+              <div class="card-body">
+                <h5 class="text-white">Clients <span class="text-warning-emphasis h6">(under this distributor)</span></h5>
+                <div class="table-responsive">
+                  <table class="table text-white" id="client-details" >
+                    <thead>
+                      <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Payment Terms</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>More</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+              
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#distributor-select').change(function () {
+      var selectedDistributor = $(this).val();
+
+      if (selectedDistributor) {
+        // Show the table
+        $('#clienttable').show();
+
+        $.ajax({
+          type: 'GET',
+          url: '{% url "get_clients_under_distributor" %}',
+          data: {
+            'distributor_id': selectedDistributor
+          },
+          success: function (data) {
+            // Clear the table body
+            $('#client-details tbody').empty();
+
+            // Populate the table with the received data
+            for (var i = 0; i < data.details.length; i++) {
+              var company = data.details[i];
+              var comp_id= company.cmp_id;
+              console.log(comp_id);
+
+              var newRow = `
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                  <td>${i + 1}</td>
+                  <td>${company.name}</td>
+                  <td>${company.email}</td>
+                  <td>${company.contact}</td>
+                  <td>${company.pterm_no} ${company.pterm_value}</td>
+                  <td>${company.sdate}</td>
+                  <td>${company.edate}</td>
+                  <td>
+                    <a class="btn btn-outline-warning btn-sm details" href="" data-comp-id="${comp_id}">Details</a>
+                  </td>
+                  
+                  
+                </tr>
+              `;
+              $('#client-details tbody').append(newRow);
+            }
+              // Add click event handler to the "Details" button
+              $('.details').on('click', function (event) {
+                event.preventDefault();
+                var compId = $(this).data('comp-id');
+                window.location.href = '{% url "distributor_client_profile_details" 0 %}'.replace('0', compId);
+              });
+          }
+        });
+      } else {
+        // If no option is selected, hide the table
+        $('#clienttable').hide();
+      }
+    });
+  });
+</script>
+  
+
+
+
+
+{% endblock %}

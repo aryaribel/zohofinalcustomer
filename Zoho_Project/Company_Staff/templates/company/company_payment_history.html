@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+    table tr:hover {
+      background-color: rgba(255, 255, 255, 0.025);
+      
+    }
+</style>
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb pt-3">
+              <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'company_profile' %}" class="text-warning-emphasis">Profile</a></li>
+              <li class="breadcrumb-item" area-current="page">Payment Terms History</li>
+            </ol>
+        </nav>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h5 class="text-white">Details</h5>
+                <div class="table-responsive mt-4">
+                    <table class="table bg-black">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                                <th class="text-white">No</th>
+                                <th class="text-white">Payment Terms</th>
+                                <th class="text-white">Start Date</th>
+                                <th class="text-white">End Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in payment_history %}
+                            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                                <td class="text-white">{{forloop.counter}}</td>
+                                <td class="text-white">{{p.payment_term}}</td>
+                                <td class="text-white">{{p.start_date}}</td>
+                                <td class="text-white">{{p.end_date}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+               
+            </div>
+        </div>
+
+    </div>
+</div>   
+     
+{% endblock %}

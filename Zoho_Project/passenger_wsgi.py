@@ -1,0 +1,1 @@
+from Zoho_Project.wsgi import application
