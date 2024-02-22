@@ -169,7 +169,7 @@
               <tbody>
                 {% for v in data %}
        
-                <tr id="over" class="clickable-row" data-href="">
+                <tr id="over" class="clickable-row" data-href="{% url 'view_customer_details' v.id %}">
                   <td style="text-align: center;">{{forloop.counter}}</td>
 
                   <td>{{v.first_name}} {{v.last_name}}</td>
@@ -228,6 +228,10 @@
               <th>opening balance type</th>
               <th>opening balance</th>
               <th>payment term</th>
+              <th>Price List</th>
+              <th>Portal language</th>
+              <th>Facebook</th>
+              <th>Twitter</th>
               <th>billing attention</th>
               <th>billing address</th>
               <th>billing city</th>

@@ -347,4 +347,17 @@ class CustomerHistory(models.Model):
 class Customer_remarks_table(models.Model):
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
     customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
-    remarks=models.CharField(max_length=500)    
+    remarks=models.CharField(max_length=500)   
+
+class Customer_comments_table(models.Model):
+    login_details=models.ForeignKey(LoginDetails,on_delete=models.CASCADE,null=True)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
+    comment=models.TextField(max_length=500)  
+
+class Customer_doc_upload_table(models.Model):
+    login_details=models.ForeignKey(LoginDetails,on_delete=models.CASCADE,null=True)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
+    title=models.TextField(max_length=200)
+    document=models.FileField(upload_to='doc/')       

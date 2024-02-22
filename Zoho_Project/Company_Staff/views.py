@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 from Company_Staff.models import *
 from django.db import models
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 from xhtml2pdf import pisa
@@ -27,6 +26,7 @@ from django.http import JsonResponse,HttpResponse,HttpResponseRedirect
 
 # Create your views here.
 from decimal import Decimal
+from django.http import HttpResponseNotFound, JsonResponse
 
 
 
@@ -1129,4 +1129,252 @@ def import_customer_excel(request):
             return redirect('view_customer_list')
         else:
             messages.error(request,'File upload Failed!11')
-            return redirect('view_customer_list')                                   
+            return redirect('view_customer_list') 
+
+def view_customer_details(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+
+        vendor_obj=Customer.objects.get(id=pk)
+
+        # Getting all vendor to disply on the left side of vendor_detailsnew page
+        vendor_objs=Customer.objects.filter(company=dash_details)
+
+        vendor_comments=Customer_comments_table.objects.filter(customer=vendor_obj)
+        vendor_history=CustomerHistory.objects.filter(customer=vendor_obj)
+    
+    content = {
+                'details': dash_details,
+               
+                'allmodules': allmodules,
+                'vendor_obj':vendor_obj,
+                'log_details':log_details,
+                'vendor_objs':vendor_objs,
+                'vendor_comments':vendor_comments,
+                'vendor_history':vendor_history,
+        }
+    return render(request,'zohomodules/customer/customer_detailsnew.html',content)    
+
+def sort_customer(request,selectId,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+
+        vendor_obj = Customer.objects.get(id=pk)
+        vendor_objs = Customer.objects.filter(company=dash_details)
+
+        if selectId == 0:
+            vendor_objs=Customer.objects.filter(company=dash_details)
+        if selectId == 1:
+            vendor_objs=Customer.objects.filter(company=dash_details).order_by('first_name')
+        if selectId == 2:
+            vendor_objs=Customer.objects.filter(company=dash_details).order_by('opening_balance')
+           
+        
+        vendor_comments=Customer_comments_table.objects.filter(customer=vendor_obj)
+        vendor_history=CustomerHistory.objects.filter(customer=vendor_obj)
+    
+        content = {
+                'details': dash_details,
+                'allmodules': allmodules,
+                'vendor_obj':vendor_obj,
+                'log_details':log_details,
+                'vendor_objs':vendor_objs,
+                'vendor_comments':vendor_comments,
+                'vendor_history':vendor_history,
+        }
+    return render(request,'zohomodules/customer/customer_detailsnew.html',content) 
+
+def customer_status_change(request,statusId,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+
+        vendor_obj = Customer.objects.get(id=pk)
+        vendor_objs = Customer.objects.filter(company=dash_details)
+
+        if statusId == 0:
+            vendor_objs=Customer.objects.filter(company=dash_details)
+        if statusId == 1:
+            vendor_objs=Customer.objects.filter(company=dash_details,customer_status='Active').order_by('-id')
+        if statusId == 2:
+            vendor_objs=Customer.objects.filter(company=dash_details,customer_status='Inactive').order_by('-id')
+           
+        
+        vendor_comments=Customer_comments_table.objects.filter(customer=vendor_obj)
+        vendor_history=CustomerHistory.objects.filter(customer=vendor_obj)
+    
+        content = {
+                'details': dash_details,
+                'allmodules': allmodules,
+                'vendor_obj':vendor_obj,
+                'log_details':log_details,
+                'vendor_objs':vendor_objs,
+                'vendor_comments':vendor_comments,
+                'vendor_history':vendor_history,
+        }
+    return render(request,'zohomodules/customer/customer_detailsnew.html',content)       
+
+def delete_customers(request, pk):
+    try:
+        vendor_obj = Customer.objects.get(id=pk)
+
+        vendor_obj.delete()
+        return redirect('view_customer_list')  
+    except Customer.DoesNotExist:
+        return HttpResponseNotFound("Customer not found.")  
+
+def customer_status(request,pk):
+    vendor_obj = Customer.objects.get(id=pk)
+    if vendor_obj.customer_status == 'Active':
+        vendor_obj.customer_status ='Inactive'
+    elif vendor_obj.customer_status == 'Inactive':
+        vendor_obj.customer_status ='Active'
+    vendor_obj.save()
+    return redirect('view_customer_details',pk)         
+
+def customer_add_comment(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+  
+        if request.method =='POST':
+            comment_data=request.POST['comments']
+       
+            vendor_id= Customer.objects.get(id=pk) 
+            vendor_obj=Customer_comments_table()
+            vendor_obj.comment=comment_data
+            vendor_obj.customer=vendor_id
+            vendor_obj.company=dash_details
+            vendor_obj.login_details= LoginDetails.objects.get(id=log_id)
+
+            vendor_obj.save()
+            return redirect('view_customer_details',pk)
+    return redirect('view_customer_details',pk) 
+
+
+def customer_delete_comment(request, pk):
+    try:
+        vendor_comment =Customer_comments_table.objects.get(id=pk)
+        vendor_id=vendor_comment.customer.id
+        vendor_comment.delete()
+        return redirect('view_customer_details',vendor_id)  
+    except Customer_comments_table.DoesNotExist:
+        return HttpResponseNotFound("comments not found.") 
+
+def add_customer_file(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        if request.method == 'POST':
+            data=request.FILES.getlist('file')
+            try:
+                for doc in data:
+
+                    vendor_obj=Customer_doc_upload_table()
+                    
+                    vendor_obj.document = doc
+                    vendor_obj.login_details = log_details
+                    vendor_obj.company = dash_details
+                    vendor_obj.customer = Customer.objects.get(id=pk)
+                    vendor_obj.save()
+                
+                messages.success(request,'File uploaded')
+                return redirect('view_customer_details',pk) 
+            except Customer_doc_upload_table.DoesNotExist:
+                return redirect('view_customer_details',pk) 
+
+def customer_shareemail(request,pk):
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+    
+        vendor_obj=Customer.objects.get(id=pk)
+
+        context = {'vendor_obj':vendor_obj,'details':dash_details}
+
+        emails_string = request.POST['email']
+        cemail = [email.strip() for email in emails_string.split(',')]
+        template_path = 'zohomodules/customer/customermailoverview.html'
+        template = get_template(template_path)
+        html  = template.render(context)
+        
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+        pdf = result.getvalue()
+        filename = f'Transactions.pdf'
+        subject = f"Transaction Details"
+        
+        email = EmailMessage(subject, f"Hi,\nPlease find the attached transaction details {vendor_obj.first_name} {vendor_obj.last_name}.\n", to=cemail)
+        email.from_email = settings.EMAIL_HOST_USER  # Set the 'from' address separately
+        email.attach(filename, pdf, "application/pdf")
+        email.send(fail_silently=False)
+
+        messages.success(request, 'Transaction has been shared via email successfully..!')
+        return redirect('view_customer_details',pk)                                             

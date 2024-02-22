@@ -56,7 +56,18 @@ urlpatterns = [
     path('view_customer_active',views.view_customer_active,name='view_customer_active'),
     path('view_customer_inactive',views.view_customer_inactive,name='view_customer_inactive'),
     path('import_customer_excel',views.import_customer_excel,name='import_customer_excel'),
-    
+    path('view_customer_details/<int:pk>',views.view_customer_details,name='view_customer_details'),
+    path('sort_customer/<int:selectId>/<int:pk>',views.sort_customer,name='sort_customer'),
+    path('customer_status_change/<int:statusId>/<int:pk>',views.customer_status_change,name='customer_status_change'),
+    path('delete_customers/<int:pk>',views.delete_customers,name='delete_customers'),
+    path('customer_status/<int:pk>',views.customer_status,name='customer_status'),
+    path('customer_add_comment/<int:pk>',views.customer_add_comment,name='customer_add_comment'),
+    path('customer_delete_comment/<int:pk>',views.customer_delete_comment,name='customer_delete_comment'), 
+    path('add_customer_file/<int:pk>',views.add_customer_file,name='add_customer_file'),
+    path('customer_shareemail/<int:pk>',views.customer_shareemail,name='customer_shareemail'),
+
+
+
   
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 ]

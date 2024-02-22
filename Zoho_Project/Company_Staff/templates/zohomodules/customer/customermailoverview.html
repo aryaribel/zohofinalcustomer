@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div id="transactiondata" class="p-2">
+
+
+
+
+
+
+
+    <fieldset8 class="p-2">
+      <div class="row text-dark ">
+        <div class="col-md-8">
+          <h6 class="text-uppercase py-2">{{vendor_obj.title}} {{vendor_obj.first_name}} {{vendor_obj.last_name}}
+          </h6>
+         
+          {% if vendor_obj.customer_phone %}
+          <p>Phone : {{vendor_obj.customer_phone}}</p>
+          {% endif %}
+          {% if vendor_obj.customer_email %}
+          <p>Email : {{vendor_obj.customer_email}}</p>
+          {% endif %}
+
+          <p>Address : {{vendor_obj.billing_address}}</p>
+          <p>GSTIN : {{vendor_obj.GST_number}}</p>
+        </div>
+        <div class="col-md-4">
+          <h6 class="T-Balance" style=" color: #1e0a0a;
+          font-weight: 800;">Balance: {{vendor_obj.current_balance}}</h6>
+        </div>
+
+
+        <hr>
+      </div>
+
+      <div>
+        <h6 class="text-dark text-uppercase py-2">TRANSACTIONS</h6>
+        <table class="transaction_table table text-dark border mb-4" id="myTable" style="border-collapse: collapse; width: 100%;">
+          <thead style="border: 1px solid black;">
+            <tr style="border: 1px solid black; height: 40px;">
+                <th>Transactions</th>
+                <th>Type</th>
+                <th>Number</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Balance</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border: 1px solid black; height: 40px;">
+                <td style="text-align: center;">{{forloop.counter}}</td>
+
+              <td style="text-align: center;">Opening Balance</td>
+              <td></td>
+              <td style="text-align: center;">{% now 'd-m-y' %}</td>
+              <td style="text-align: center;">{{ vendor_obj.opening_balance }}</td>
+              <td style="text-align: center;">{{ vendor_obj.opening_balance }}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        
+        
+      </div>
+
+    </fieldset8>
+  </div>
+ 
+</body>
+</html>
