@@ -65,7 +65,8 @@ urlpatterns = [
     path('customer_delete_comment/<int:pk>',views.customer_delete_comment,name='customer_delete_comment'), 
     path('add_customer_file/<int:pk>',views.add_customer_file,name='add_customer_file'),
     path('customer_shareemail/<int:pk>',views.customer_shareemail,name='customer_shareemail'),
-
+    path('Customer_edit/<int:pk>',views.Customer_edit,name='Customer_edit'),
+    path('do_customer_edit/<int:pk>',views.do_customer_edit,name='do_customer_edit'),
 
 
   

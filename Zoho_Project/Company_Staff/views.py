@@ -861,7 +861,7 @@ def add_customer(request):
                     print(mapped2)
                     for ele in mapped2:
                         created = CustomerContactPersons.objects.get_or_create(title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
-                                work_phone=ele[4],mobile=ele[5],skype_name_number=ele[6],designation=ele[7],department=ele[8],company=dash_details,vendor=vendor)
+                                work_phone=ele[4],mobile=ele[5],skype_name_number=ele[6],designation=ele[7],department=ele[8],company=dash_details,customer=vendor)
                 
         
             messages.success(request, 'Data saved successfully!')   
@@ -1377,4 +1377,214 @@ def customer_shareemail(request,pk):
         email.send(fail_silently=False)
 
         messages.success(request, 'Transaction has been shared via email successfully..!')
-        return redirect('view_customer_details',pk)                                             
+        return redirect('view_customer_details',pk)  
+
+
+def Customer_edit(request,pk):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+    log_details= LoginDetails.objects.get(id=log_id)
+
+   
+
+    if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+
+        allmodules= ZohoModules.objects.get(company=dash_details,status='New') 
+
+        vendor_obj=Customer.objects.get(id=pk)
+
+    vendor_contact_obj=CustomerContactPersons.objects.filter(customer=vendor_obj)  
+    comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
+   
+    content = {
+            'details': dash_details,
+            'allmodules': allmodules,
+            'vendor_obj':vendor_obj,
+            'log_details':log_details,
+            'vendor_contact_obj':vendor_contact_obj,
+            'comp_payment_terms':comp_payment_terms,
+    }
+   
+
+    return render(request,'zohomodules/customer/edit_customer.html',content)
+
+def do_customer_edit(request,pk):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            staff_details=StaffDetails.objects.get(login_details=log_details)
+            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        if request.method=="POST":
+            vendor_data=Customer.objects.get(id=pk)
+            vendor_data.login_details=log_details
+            vendor_data.company=dash_details
+            vendor_data.title = request.POST.get('salutation')
+            vendor_data.first_name=request.POST['first_name']
+            vendor_data.last_name=request.POST['last_name']
+            vendor_data.company_name=request.POST['company_name']
+            vendor_data.customer_display_name=request.POST['v_display_name']
+            vendor_data.customer_email=request.POST['vendor_email']
+            vendor_data.customer_phone=request.POST['w_phone']
+            vendor_data.customer_mobile=request.POST['m_phone']
+            vendor_data.skype=request.POST['skype_number']
+            vendor_data.designation=request.POST['designation']
+            vendor_data.department=request.POST['department']
+            vendor_data.website=request.POST['website']
+            vendor_data.GST_treatement=request.POST['gst']
+            vendor_data.customer_status="Active"
+            vendor_data.remarks=request.POST['remark']
+            
+            cob=Decimal(request.POST['opening_bal'])
+            oc=Decimal(vendor_data.current_balance) 
+            ob=Decimal(vendor_data.opening_balance) 
+
+            if cob > ob:
+                diffadd=cob-ob
+                oc=oc + diffadd
+                vendor_data.current_balance=oc
+                vendor_data.opening_balance=cob
+            elif cob < ob:
+                diffadd=ob-cob
+                oc=oc-diffadd
+                vendor_data.current_balance=oc
+                vendor_data.opening_balance=cob
+
+            else:
+                vendor_data.current_balance=request.POST['opening_bal']   
+       
+            
+
+            x=request.POST['gst']
+            if x=="Unregistered Business-not Registered under GST":
+                vendor_data.PAN_number=request.POST['pan_number']
+                vendor_data.GST_number="null"
+            else:
+                vendor_data.GST_number=request.POST['gst_number']
+                vendor_data.PAN_number=request.POST['pan_number']
+
+            vendor_data.place_of_supply=request.POST['source_supply']
+            vendor_data.currency=request.POST['currency']
+            op_type=request.POST.get('op_type')
+            if op_type is not None:
+                vendor_data.opening_balance_type=op_type
+            else:
+                vendor_data.opening_balance_type='Opening Balance not selected'
+            vendor_data.opening_balance=request.POST['opening_bal']
+            vendor_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
+            vendor_data.price_list=request.POST['plst']
+            vendor_data.portal_language=request.POST['plang']
+            vendor_data.facebook=request.POST['fbk']
+            vendor_data.twitter=request.POST['twtr']
+            
+           
+            vendor_data.billing_attention=request.POST['battention']
+            vendor_data.billing_country=request.POST['bcountry']
+            vendor_data.billing_address=request.POST['baddress']
+            vendor_data.billing_city=request.POST['bcity']
+            vendor_data.billing_state=request.POST['bstate']
+            vendor_data.billing_pincode=request.POST['bzip']
+            vendor_data.billing_mobile=request.POST['bphone']
+            vendor_data.billing_fax=request.POST['bfax']
+            vendor_data.shipping_attention=request.POST['sattention']
+            vendor_data.shipping_country=request.POST['s_country']
+            vendor_data.shipping_address=request.POST['saddress']
+            vendor_data.shipping_city=request.POST['scity']
+            vendor_data.shipping_state=request.POST['sstate']
+            vendor_data.shipping_pincode=request.POST['szip']
+            vendor_data.shipping_mobile=request.POST['sphone']
+            vendor_data.shipping_fax=request.POST['sfax']
+            vendor_data.save()
+
+
+              # ................ Adding to History table...........................
+            
+            vendor_history_obj=CustomerHistory()
+            vendor_history_obj.company=dash_details
+            vendor_history_obj.login_details=log_details
+            vendor_history_obj.customer=vendor_data
+            vendor_history_obj.date=date.today()
+            vendor_history_obj.action='Edited'
+            vendor_history_obj.save()
+    # .......................................................adding to remaks table.....................
+            vdata=Customer.objects.get(id=vendor_data.id)
+            try:
+
+                rdata=Customer_remarks_table.objects.get(customer=vdata)
+                rdata.remarks=request.POST['remark']
+                rdata.company=dash_details
+                rdata.customer=vdata
+                rdata.save()
+            except Customer_remarks_table.DoesNotExist:
+                remarks_obj= Customer_remarks_table()   
+                remarks_obj.remarks=request.POST['remark']
+                remarks_obj.company=dash_details
+                remarks_obj.customer=vdata
+                remarks_obj.save()
+
+
+    #  ...........................adding multiple rows of table to model  ........................................................  
+        
+            title =request.POST.getlist('salutation[]')
+            first_name =request.POST.getlist('first_name[]')
+            last_name =request.POST.getlist('last_name[]')
+            email =request.POST.getlist('email[]')
+            work_phone =request.POST.getlist('wphone[]')
+            mobile =request.POST.getlist('mobile[]')
+            skype_name_number =request.POST.getlist('skype[]')
+            designation =request.POST.getlist('designation[]')
+            department =request.POST.getlist('department[]') 
+            person = request.POST.getlist('contact_person_id[]')
+            vdata=Customer.objects.get(id=vendor_data.id)
+            vendor=vdata
+            print(person)
+            if title != ['Select']:
+                if len(title)==len(first_name)==len(last_name)==len(email)==len(work_phone)==len(mobile)==len(skype_name_number)==len(designation)==len(department)==len(person):
+                    mapped2=zip(title,first_name,last_name,email,work_phone,mobile,skype_name_number,designation,department,person)
+                    mapped2=list(mapped2)
+                    for ele in mapped2:
+                       
+                        existing_instance = CustomerContactPersons.objects.filter(id=ele[9], company=dash_details, customer=vendor).first()
+                        if existing_instance:
+                            # Update the existing instance
+                            existing_instance.title = ele[0]
+                            existing_instance.first_name = ele[1]
+                            existing_instance.last_name = ele[2]
+                            existing_instance.email = ele[3]
+                            existing_instance.work_phone  = ele[4]
+                            existing_instance.mobile = ele[5]
+                            existing_instance.skype = ele[6]
+                            existing_instance.designation = ele[7]
+                            existing_instance.department = ele[8]
+
+                            # Update other fields
+
+                            existing_instance.save()
+                        else:
+                            # Create a new instance
+                            new_instance = CustomerContactPersons.objects.create(
+                                title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
+                                work_phone=ele[4],mobile=ele[5],skype_name_number=ele[6],designation=ele[7],department=ele[8],company=dash_details,customer=vendor
+                            )
+            return redirect('view_customer_details',pk)                                               
