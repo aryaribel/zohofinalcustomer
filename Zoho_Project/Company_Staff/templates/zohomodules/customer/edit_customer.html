@@ -64,7 +64,7 @@
                 {% if log_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                 {% if log_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                  <li class="breadcrumb-item"><a href="{% url 'view_customer_list' %}" class="text-warning-emphasis">Customer List</a></li>
-                 <li class="breadcrumb-item" aria-current="page">Create Customer</li>
+                 <li class="breadcrumb-item" aria-current="page">Edit Customer</li>
         </nav>
   
         <div class="card bg-black shadow p-3 rounded">
@@ -72,19 +72,31 @@
             <h3  class="mb-4 mt-2  " style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Customer</h3>
             
            
-            <form  method="post" action="{% url 'do_customer_edit' vendor_obj.id %}"  enctype="multipart/form-data" class="mb-3">
+            <form  method="post" action="{% url 'do_customer_edit' customer_obj.id %}"  enctype="multipart/form-data" class="mb-3">
                 {% csrf_token %}
         
-                <div class="form-group row mt-4">
-                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color: white;">Customer Type</label>
-                    
-                    <div class=" col-sm-12 col-md-3 col-lg-3">
-                        <input  type="radio"  value="Business" name="type" >
-                                <label for="Business"> Business</label>
-                               &nbsp;&nbsp;&nbsp;
-                               <input  type="radio"  value="Individual" name="type" >
-                               <label for="Business">Individual</label>
-                    </div><br></div>
+               
+
+                    <div class="form-group row mt-4">
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white">Customer Type
+                            </label>
+                        <div class="col-sm-12 col-md-3 col-lg-3 d-flex align-items-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="type"  value="Business"
+                                    {% if customer_obj.customer_type == "Business" %} checked {% endif %}>
+                                <label class="form-check-label text-white" for="Business">Business</label>
+                            </div>
+                            
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="type" value="Individual"
+                                    {% if customer_obj.customer_type == "Individual" %} checked {% endif %}>
+                                <label class="form-check-label text-white" for="Individual">Individual</label>
+                            </div>
+
+                        </div>
+                    </div>
+
+
 
 
 
@@ -94,7 +106,7 @@
                     </div>
                     <div class="col-sm-12 col-md-1 col-lg-1" >
                         <select id="select1"  name="salutation" class="form-control bg-light text-dark mt-2 " >
-                            <option value="{{vendor_obj.title}}" selected>{{vendor_obj.title}}</option>
+                            <option value="{{customer_obj.title}}" selected>{{customer_obj.title}}</option>
 
                             <option value="Mr">Mr</option>
                             <option value="Mrs">Mrs</option>
@@ -104,11 +116,11 @@
                         </select> 
                     </div>
                     <div class="col-sm-12 col-md-2 col-lg-3" >
-                        <input  type="text" class="form-control bg-light text-dark mt-2 change-disply " id="fname" name="first_name" placeholder="first name" value="{{vendor_obj.first_name}}" required >
+                        <input  type="text" class="form-control bg-light text-dark mt-2 change-disply " id="fname" name="first_name" placeholder="first name" value="{{customer_obj.first_name}}" required >
 
                     </div>
                     <div class="col-sm-12 col-md-2 col-lg-3" >
-                        <input type="text" class="form-control bg-light text-dark mt-2 " id="lname" name="last_name" placeholder="last name" value="{{vendor_obj.last_name}}" required >
+                        <input type="text" class="form-control bg-light text-dark mt-2 " id="lname" name="last_name" placeholder="last name" value="{{customer_obj.last_name}}" required >
 
                     </div>
                 </div>
@@ -132,7 +144,7 @@
                         <label>Company Name</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control bg-light text-dark " name="company_name" value="{{vendor_obj.company_name}}" required>     
+                        <input  type="text" class="form-control bg-light text-dark " name="company_name" value="{{customer_obj.company_name}}" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
 
                     </div>
@@ -145,7 +157,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="email" class="form-control bg-light text-dark" name="vendor_email"  id="vendor-email" value="{{vendor_obj.customer_email}}" required> 
+                        <input  type="email" class="form-control bg-light text-dark" name="vendor_email"  id="vendor-email" value="{{customer_obj.customer_email}}" required> 
                         <span class=" text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
     
                     </div>
@@ -158,14 +170,14 @@
                         <label class="col-form-label text-white">Customer phone</label>
                     </div>
                     <div class="col-sm-12 col-md-3 col-lg-3">
-                        <input id="workphone"  type="text" class="form-control bg-light text-dark mt-2" pattern="[0-9]{7}"  name="w_phone" placeholder="work phone" value="{{vendor_obj.customer_phone}}"required>
+                        <input id="workphone"  type="text" class="form-control bg-light text-dark mt-2" pattern="[0-9]{7}"  name="w_phone" placeholder="work phone" value="{{customer_obj.customer_phone}}"required>
                         <span id="work-phone-message" class="mt-2 " style="font-size: 10px;"></span >
                         <span id="workphone_label" class="mt-2 text-danger" style="font-size: 10px;"></span >
                         <div class="invalid-feedback"></div>   
     
                     </div>
                     <div class=" col-sm-12 col-md-3 col-lg-4">
-                        <input id="mphone"  type="text" pattern="[0-9]{10}" class="form-control bg-light text-dark mt-2"  name="m_phone" placeholder="mobile number" value="{{vendor_obj.customer_mobile}}" required>
+                        <input id="mphone"  type="text" pattern="[0-9]{10}" class="form-control bg-light text-dark mt-2"  name="m_phone" placeholder="mobile number" value="{{customer_obj.customer_mobile}}" required>
                         <span id="phone-message" class="mt-2 " style="font-size: 10px;"></span >
                         <span id="mphone_label" class="mt-2 text-danger" style="font-size: 10px;"></span >
                         <div class="invalid-feedback"></div>   
@@ -190,7 +202,7 @@
                             <label>Skype name/Number</label>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-6">
-                            <input  type="text" class="form-control bg-light text-dark" name="skype_number" value="{{vendor_obj.skype}}">      
+                            <input  type="text" class="form-control bg-light text-dark" name="skype_number" value="{{customer_obj.skype}}">      
                         </div>
 
                     </div>
@@ -200,7 +212,7 @@
                             <label>Designation</label>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-6">
-                            <input  type="text" class="form-control bg-light text-dark" name="designation" value="{{vendor_obj.designation}}">      
+                            <input  type="text" class="form-control bg-light text-dark" name="designation" value="{{customer_obj.designation}}">      
                         </div>
 
                     </div>
@@ -210,7 +222,7 @@
                             <label>Department</label>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-6">
-                            <input  type="text" class="form-control bg-light text-dark" name="department" value="{{vendor_obj.department}}">      
+                            <input  type="text" class="form-control bg-light text-dark" name="department" value="{{customer_obj.department}}">      
                         </div>
 
                     </div>
@@ -220,7 +232,7 @@
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Website</label></div>
                     <div class="col-sm-12 col-md-6 col-lg-6">
-                        <input id="web" type="text" class="form-control bg-light text-dark" onclick="mobile_phone()"    name="website" value="{{vendor_obj.website}}">      
+                        <input id="web" type="text" class="form-control bg-light text-dark" onclick="mobile_phone()"    name="website" value="{{customer_obj.website}}">      
                     </div>
                 </div>
             </fieldset1>
@@ -245,9 +257,9 @@
                         
                         <div class=" col-sm-12 col-md-3 col-lg-3">
                             <select name="gst" id="GSTT" class="form-control bg-light text-dark" onclick="gstPan_function()">
-                                <option value="{{vendor_obj.GST_treatement}}" selected>{{vendor_obj.GST_treatement}}</option>
+                                <option value="{{customer_obj.GST_treatement}}" selected>{{customer_obj.GST_treatement}}</option>
 
-                                <option value="Select a Gst Treatment" selected>Select a Gst Treatment</option>
+                                <option value="Select a Gst Treatment">Select a Gst Treatment</option>
                                 <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
                                 <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">
                                     Registered Business-Composition Business that is registered under the Composition schemen in GST
@@ -266,7 +278,7 @@
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white"  > GSTIN/UIN*</label>
                             
                             <div class=" col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark" name="gst_number" id="gstInput" value="{{vendor_obj.GST_number}}"> 
+                                <input type="text" class="form-control bg-light text-dark" name="gst_number" id="gstInput" value="{{customer_obj.GST_number}}"> 
                                 <span id="gstMessage"></span>       
         
                             </div>
@@ -281,7 +293,7 @@
                             <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > PAN</label>
                             
                             <div class=" col-sm-12 col-md-3 col-lg-3">
-                                <input type="text" class="form-control bg-light text-dark"  id="panInput"  name="pan_number" value="{{vendor_obj.PAN_number}}">  
+                                <input type="text" class="form-control bg-light text-dark"  id="panInput"  name="pan_number" value="{{customer_obj.PAN_number}}">  
                                 <span id="panMessage"></span>    
 
         
@@ -298,7 +310,7 @@
                         
                         <div class=" col-sm-12 col-md-3 col-lg-3">
                             <select name="source_supply" id="PLACE" class="form-control bg-light text-dark">
-                                <option value="{{vendor_obj.place_of_supply}}" selected>{{vendor_obj.place_of_supply}}</option>
+                                <option value="{{customer_obj.place_of_supply}}" selected>{{customer_obj.place_of_supply}}</option>
 
                                 <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                                 <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
@@ -350,10 +362,12 @@
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:rgb(214, 75, 75) ;">Tax Preference*</label>
                         
                         <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <input type="checkbox" id="Taxable" name="tax1" value="Taxable" value="{{vendor_obj.tax_preference}}">&nbsp;
+
+                            <input type="checkbox" id="Taxable" name="tax1" {% if customer_obj.tax_preference == "Taxable" %} checked {% endif %}
+                            value="{{customer_obj.tax_preference}}">&nbsp;
                             <label for="vehicle1" class="pt-1">Taxable</label>
                             &nbsp;&nbsp;&nbsp;
-                            <input type="checkbox" id="Tax Exempt" name="tax1" value="Tax Exempt" value="{{vendor_obj.tax_preference}}">&nbsp;
+                            <input type="checkbox" id="Tax Exempt" name="tax1" {% if customer_obj.tax_preference == "Tax Exempt" %} checked {% endif %} value="{{customer_obj.tax_preference}}">&nbsp;
                             <label for="vehicle2" class="pt-1"> Tax Exempt</label>
                       
                         </div>
@@ -379,26 +393,26 @@
                         <div class="col-sm-12 col-md-3 col-lg-3 ">
                            <label class="col-form-label text-white mb-3"> Opening Balance Type</label>
                         </div>
-                        <div class="col-sm-12 col-md-3 col-lg-4 d-flex align-items-center">
+                        <div class="col-sm-12 col-md-3 col-lg-3 d-flex align-items-center">
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="op_type" id="debit" value="debit">
-                                {% if vendor_obj.opening_balance_type == "debit" %} checked {% endif %}>
-
+                                <input class="form-check-input" type="radio" name="op_type" id="debit" value="debit"
+                                    {% if customer_obj.opening_balance_type == "debit" %} checked {% endif %}>
                                 <label class="form-check-label text-white" for="debit">Debit</label>
                             </div>
+                            
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="op_type" id="credit" value="credit">
-                                {% if vendor_obj.opening_balance_type == "credit" %} checked {% endif %}>
-
+                                <input class="form-check-input" type="radio" name="op_type" id="credit" value="credit"
+                                    {% if customer_obj.opening_balance_type == "credit" %} checked {% endif %}>
                                 <label class="form-check-label text-white" for="credit">Credit</label>
                             </div>
+
                         </div>
                     </div>
 
                     <div class="form-group row mt-4">
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Opening Balance Amount</label>                    
                         <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <input  type="number" class="form-control bg-light text-dark" name="opening_bal" value="{{vendor_obj.opening_balance}}">      
+                            <input  type="number" class="form-control bg-light text-dark" name="opening_bal" value="{{customer_obj.opening_balance}}">      
                         </div>
                     </div>
                     
@@ -408,7 +422,7 @@
                         <div class=" col-sm-12 col-md-3 col-lg-3">
                             <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">
                                
-                                <option value="{{vendor_obj.company_payment_terms.id}}" selected>{{vendor_obj.company_payment_terms.term_name}}</option>
+                                <option value="{{customer_obj.company_payment_terms.id}}" selected>{{customer_obj.company_payment_terms.term_name}}</option>
 
                                 {% for pay_terms in comp_payment_terms %}
                                 <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
@@ -436,84 +450,21 @@
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" >Price List </label>
                          
                         <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="plst" id="PLACE" id="PLACE" class="form-control bg-light text-dark">
-                                <option value="{{vendor_obj.price_list}}" selected>{{vendor_obj.price_list}}</option>
+                            <select name="plst" id="PLACE" class="form-control bg-light text-dark">
+                                {% for price_list in price_lists %}
+                                 {% if customer_obj.price_list == price_list.id %}
+                                <option value="{{price_list.id}}" selected>{{price_list.name}}</option>
+                                 {% endif %}
+                                 {% endfor %}
 
             
-                                <option type="text">PriceBook0 [ 68% Markup ]</option>
-                                <option type="text">PriceBook1 [ 70% Markdown ]</option>
+                                {% for price_list in price_lists %}
+
+                                <option value="{{price_list.id}}">{{price_list.name}}</option>
     
                                     
-                            
-                                  <option type="text" value ='3'> book</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='6'> Price</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='12'> price01</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='13'> price06</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='15'> Price1</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='16'> Price2</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='17'> price02</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='18'> Mouse</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='19'> Keyboard</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='20'> price 09</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='21'> discount price</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='22'> hjf76</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='23'> demo</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='24'> demo1</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='25'> demo price list</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='26'> price 01</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='27'> Anoop Krishnan</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='28'> price01</option>
+                                {% endfor %}
+
                                  
                                   
                                  </select>
@@ -537,22 +488,21 @@
                                         Portal Language</label>
                                         <div class=" col-sm-12 col-md-3 col-lg-3">
                                             <select name="plang" id="PLACE" style="width: 100%;" class="form-control bg-light text-dark"  >
-                                                <option value="{{vendor_obj.portal_language}}" selected>{{vendor_obj.portal_language}}</option>
+                                                <option value="{{customer_obj.portal_language}}" selected>{{customer_obj.portal_language}}</option>
 
-                                                <option selected disabled value="" >Choose..</option>
                                                 <option value="ENGLISH">ENGLISH</option>
                                               </select>
                                     </div></div>   
                                     <div class="form-group row mt-4">
                                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:white ;">Facebook </label>
                                             <div class=" col-sm-12 col-md-3 col-lg-3">
-                                                <input type="text" id="cn" name="fbk" class="form-control bg-light text-dark" value="{{vendor_obj.facebook}}">
+                                                <input type="text" id="cn" name="fbk" class="form-control bg-light text-dark" value="{{customer_obj.facebook}}">
                                                 
                                         </div></div>
                                     <div class="form-group row mt-4">
                                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:white ;">Twitter</label>
                                             <div class=" col-sm-12 col-md-3 col-lg-3">
-                                                <input type="text" id="cn" name="twtr" class="form-control bg-light text-dark" value="{{vendor_obj.twitter}}">
+                                                <input type="text" id="cn" name="twtr" class="form-control bg-light text-dark" value="{{customer_obj.twitter}}">
                                               
                                         </div></div>
                                         
@@ -578,7 +528,7 @@
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Attention</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark" name="battention" id="batten" value="{{vendor_obj.billing_attention}}">      
+                                        <input  type="text" class="form-control bg-light text-dark" name="battention" id="batten" value="{{customer_obj.billing_attention}}">      
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
@@ -592,39 +542,39 @@
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Address</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <textarea class="form-control bg-light " style="border: none;color: rgb(7, 7, 7);" cols="26" rows="4" name="baddress" id="badd1">{{vendor_obj.billing_address}}</textarea>
+                                        <textarea class="form-control bg-light " style="border: none;color: rgb(7, 7, 7);" cols="26" rows="4" name="baddress" id="badd1">{{customer_obj.billing_address}}</textarea>
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > City</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark" name="bcity" id="bcty" value="{{vendor_obj.billing_city}}">      
+                                        <input  type="text" class="form-control bg-light text-dark" name="bcity" id="bcty" value="{{customer_obj.billing_city}}">      
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > State</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input type="text" class="form-control bg-light text-dark" name="bstate" id="bste" value="{{vendor_obj.billing_state}}">      
+                                        <input type="text" class="form-control bg-light text-dark" name="bstate" id="bste" value="{{customer_obj.billing_state}}">      
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Zip Code </label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="number" class="form-control bg-light text-dark" name="bzip" id="bzp" value="{{vendor_obj.billing_pincode}}">      
+                                        <input  type="number" class="form-control bg-light text-dark" name="bzip" id="bzp" value="{{customer_obj.billing_pincode}}">      
                                     </div>
                                 </div>
                             
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Phone </label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input id="bphone_num"  type="tel" pattern="[0-9]{10}" class="form-control bg-light text-dark" name="bphone" value="{{vendor_obj.billing_mobile}}">
+                                        <input id="bphone_num"  type="tel" pattern="[0-9]{10}" class="form-control bg-light text-dark" name="bphone" value="{{customer_obj.billing_mobile}}">
                                         <label for="" id="bphone_label"></label>      
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Fax </label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{7}" onmouseout="fax_number()"  onclick="bphone_number()"  name="bfax" id="bfx" value="{{vendor_obj.billing_fax}}">  
+                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{7}" onmouseout="fax_number()"  onclick="bphone_number()"  name="bfax" id="bfx" value="{{customer_obj.billing_fax}}">  
                                     
                                         <label for="" id="fax_label"></label> 
                                     </div>
@@ -644,7 +594,7 @@
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Attention</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark " style="color: white;" name="sattention" id="satten" value="{{vendor_obj.shipping_attention}}">      
+                                        <input  type="text" class="form-control bg-light text-dark " style="color: white;" name="sattention" id="satten" value="{{customer_obj.shipping_attention}}">      
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
@@ -658,25 +608,25 @@
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Address</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <textarea class="form-control bg-light" style="border: none;color: rgb(10, 10, 10);" id="sadd1" cols="26" rows="4" name="saddress">{{vendor_obj.shipping_address}}</textarea>
+                                        <textarea class="form-control bg-light" style="border: none;color: rgb(10, 10, 10);" id="sadd1" cols="26" rows="4" name="saddress">{{customer_obj.shipping_address}}</textarea>
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > City</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="text" class="form-control bg-light text-dark" name="scity" id="scty" value="{{vendor_obj.shipping_city}}">      
+                                        <input  type="text" class="form-control bg-light text-dark" name="scity" id="scty" value="{{customer_obj.shipping_city}}">      
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > State</label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input type="text" class="form-control bg-light text-dark" name="sstate" id="sste" value="{{vendor_obj.shipping_state}}">      
+                                        <input type="text" class="form-control bg-light text-dark" name="sstate" id="sste" value="{{customer_obj.shipping_state}}">      
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Zip Code </label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="number" class="form-control bg-light text-dark" name="szip" id="szp" value="{{vendor_obj.shipping_pincode}}">      
+                                        <input  type="number" class="form-control bg-light text-dark" name="szip" id="szp" value="{{customer_obj.shipping_pincode}}">      
                                     </div>
                                 </div>
                             
@@ -684,14 +634,14 @@
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Phone </label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{10}" style="color: white;" name="sphone" id="sphone_num" value="{{vendor_obj.shipping_mobile}}">  
+                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{10}" style="color: white;" name="sphone" id="sphone_num" value="{{customer_obj.shipping_mobile}}">  
                                         <label for="" id="sphone_label"></label>    
                                     </div>
                                 </div>
                                 <div class="form-group row mt-4">
                                     <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Fax </label>                    
                                     <div class=" col-sm-12 col-md-6 col-lg-6">
-                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{7}" style="color: white;" name="sfax" onclick="sphone_number()" onmouseout="sfax_number()" id="sfx" value="{{vendor_obj.shipping_fax}}"> 
+                                        <input  type="tel" class="form-control bg-light text-dark" pattern="[0-9]{7}" style="color: white;" name="sfax" onclick="sphone_number()" onmouseout="sfax_number()" id="sfx" value="{{customer_obj.shipping_fax}}"> 
                                         <label for="" id="sfax_label"></label>     
                                     </div>
                                 </div>
@@ -791,7 +741,7 @@
                         <div class="col-sm-12 col-md-8 col-lg-8">
                             <div class="form-group row mt-4">
                                 <div class=" col-sm-12 col-md-6 col-lg-6">
-                                    <textarea class="bg-light w-100" style="border: none;color: rgb(5, 5, 5);"   rows="5" name="remark">{{vendor_obj.remarks}}</textarea>
+                                    <textarea class="bg-light w-100" style="border: none;color: rgb(5, 5, 5);"   rows="5" name="remark">{{customer_obj.remarks}}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -995,6 +945,26 @@ const fname = document.getElementById('fname');
 const laname = document.getElementById('lname');
 const vDisplayName = document.getElementById('v_display_name');
 
+const selectedTitle = Title.value;
+    const selectedFname = fname.value;
+    const selectedLname = laname.value;
+
+    // Clear existing options
+    vDisplayName.innerHTML = '';
+ // Add new options based on input field values
+ const option1 = document.createElement('option');
+    option1.text = selectedTitle + ' ' + selectedFname + ' ' + selectedLname;
+    vDisplayName.add(option1);
+
+   
+
+    const option2 = document.createElement('option');
+    option2.text = selectedFname + ' ' + selectedLname;
+    vDisplayName.add(option2);
+
+    const option3 = document.createElement('option');
+    option3.text = selectedLname + ' ' + selectedFname;
+    vDisplayName.add(option3);
 // Listen for input events on the initial input fields
 Title.addEventListener('input', updateOutputFields);
 fname.addEventListener('input', updateOutputFields);

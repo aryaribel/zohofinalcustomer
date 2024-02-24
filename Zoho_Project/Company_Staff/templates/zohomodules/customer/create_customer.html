@@ -349,8 +349,8 @@
                             <input type="checkbox" id="Taxable" name="tax1" value="Taxable">&nbsp;
                             <label for="vehicle1" class="pt-1">Taxable</label>
                             &nbsp;&nbsp;&nbsp;
-                            <input type="checkbox" id="Tax Exempt" name="tax1" value="Tax Exempt">&nbsp;
-                            <label for="vehicle2" class="pt-1"> Tax Exempt</label>
+                            <input type="checkbox" id="Tax_Exempt" name="tax1" value="Tax Exempt">&nbsp;
+                            <label for="vehicle2" class="pt-1">Tax Exempt</label>
                       
                         </div>
      
@@ -429,81 +429,14 @@
                         <div class=" col-sm-12 col-md-3 col-lg-3">
                             <select name="plst" id="PLACE" id="PLACE" class="form-control bg-light text-dark">
                                 
-            
-                                <option type="text">PriceBook0 [ 68% Markup ]</option>
-                                <option type="text">PriceBook1 [ 70% Markdown ]</option>
+                                {% for price_list in price_lists %}
+
+                                <option value="{{price_list.id}}">{{price_list.name}}</option>
     
                                     
-                            
-                                  <option type="text" value ='3'> book</option>
+                                {% endfor %}
+
                                  
-                                  
-                            
-                                  <option type="text" value ='6'> Price</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='12'> price01</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='13'> price06</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='15'> Price1</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='16'> Price2</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='17'> price02</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='18'> Mouse</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='19'> Keyboard</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='20'> price 09</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='21'> discount price</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='22'> hjf76</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='23'> demo</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='24'> demo1</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='25'> demo price list</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='26'> price 01</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='27'> Anoop Krishnan</option>
-                                 
-                                  
-                            
-                                  <option type="text" value ='28'> price01</option>
                                  
                                   
                                  </select>

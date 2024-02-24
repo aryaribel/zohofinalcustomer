@@ -344,6 +344,45 @@ class CustomerHistory(models.Model):
     action = models.CharField(max_length=220,null=True,blank=True)
     date = models.DateField(auto_now_add=True, null=True, blank=True)
 
+class PriceList(models.Model):
+    
+    name = models.CharField(max_length=255, null=True)
+    type_choices = [
+        ('Sales', 'Sales'),('Purchase', 'Purchase'),]
+    type = models.CharField(max_length=10, choices=type_choices, null=True)
+    item_rate_choices = [('Percentage', 'Percentage'),('Each Item', 'Each Item'),]
+    item_rate_type = models.CharField(max_length=15, choices=item_rate_choices, null=True)
+    description = models.TextField(null=True)
+    percentage_type_choices = [('Markup', 'Markup'),('Markdown', 'Markdown'),]
+    percentage_type = models.CharField(max_length=10, choices=percentage_type_choices, null=True, blank=True)
+    percentage_value = models.IntegerField(null=True, blank=True)
+    round_off_choices = [
+        ('Never Mind', 'Never Mind'),
+        ('Nearest Whole Number', 'Nearest Whole Number'),
+        ('0.99', '0.99'),
+        ('0.50', '0.50'),
+        ('0.49', '0.49'),
+    ]
+    round_off = models.CharField(max_length=20, choices=round_off_choices, null=True)
+    currency_choices = [('Indian Rupee', 'Indian Rupee')]
+    currency = models.CharField(max_length=20, choices=currency_choices, null=True)
+    date = models.DateField(auto_now_add=True, null=True)
+    STATUS_CHOICES = [('Active', 'Active'),('Inactive', 'Inactive'),]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Active')
+    attachment = models.FileField(upload_to='price_list_attachment/', null=True, blank=True)
+
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE)
+
+class PriceListItem(models.Model):
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE)
+    price_list = models.ForeignKey(PriceList, on_delete=models.CASCADE)
+    item = models.ForeignKey(Items, on_delete=models.CASCADE)  
+    standard_rate = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    custom_rate = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+
+
 class Customer_remarks_table(models.Model):
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
     customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
@@ -360,4 +399,6 @@ class Customer_doc_upload_table(models.Model):
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
     customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
     title=models.TextField(max_length=200)
-    document=models.FileField(upload_to='doc/')       
+    document=models.FileField(upload_to='doc/')  
+
+
