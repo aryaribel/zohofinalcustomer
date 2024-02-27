@@ -358,7 +358,7 @@
 
 
 
-                    <div class="form-group row mt-4">
+                    <!-- <div class="form-group row mt-4">
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:rgb(214, 75, 75) ;">Tax Preference*</label>
                         
                         <div class=" col-sm-12 col-md-3 col-lg-3">
@@ -373,7 +373,28 @@
                         </div>
      
      
+                    </div> -->
+
+
+                    <div class="form-group row mt-4">
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color:rgb(214, 75, 75) ;">Tax Preference*</label>
+                        
+                    <div class="col-sm-12 col-md-3 col-lg-4 d-flex align-items-center">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="tax1" id="Taxable" value="Taxable"
+                            {% if customer_obj.tax_preference == "Taxable" %} checked {% endif %}>
+
+                            <label class="form-check-label text-white" for="vehicle1">Taxable</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="tax1" id="Tax_Exempt" value="Tax Exempt"
+                            {% if customer_obj.tax_preference == "Tax Exempt" %} checked {% endif %}>
+                            <label class="form-check-label text-white" for="vehicle2">Tax Exempt</label>
+                        </div>
                     </div>
+                </div>
+
+
                     
                     <div class="form-group row mt-4">
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Currency*</label>
@@ -415,6 +436,45 @@
                             <input  type="number" class="form-control bg-light text-dark" name="opening_bal" value="{{customer_obj.opening_balance}}">      
                         </div>
                     </div>
+
+                    <div class="form-group row mt-4">
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" >Credit Limit</label>                    
+                        <div class=" col-sm-12 col-md-3 col-lg-3">
+                            <input  type="number" class="form-control bg-light text-dark" name="credit_lm" id="cl" value="0.00">      
+                        </div>
+                    </div>
+
+
+                     <!-- Alert -->
+                     <div id="custom-alert" class="alert">
+                        <span class="close-btn">&times;</span>
+                        <div class="alert-content">
+                          Credit limit should not exceed opening balance amount.
+                        </div>
+                      </div>
+                      <style>
+                        .alert {
+                                display: none;
+                                position: fixed;
+                                top: 30%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                background-color: #f44336;
+                                color: white;
+                                padding: 15px;
+                                border-radius: 5px;
+                                }
+
+                                .close-btn {
+                                float: right;
+                                cursor: pointer;
+                                }
+
+                                .alert-content {
+                                margin-bottom: 10px;
+                                }
+                      </style>
+
                     
                     <div class="form-group row mt-4">
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
@@ -451,16 +511,13 @@
                          
                         <div class=" col-sm-12 col-md-3 col-lg-3">
                             <select name="plst" id="PLACE" class="form-control bg-light text-dark">
-                                {% for price_list in price_lists %}
-                                 {% if customer_obj.price_list == price_list.id %}
-                                <option value="{{price_list.id}}" selected>{{price_list.name}}</option>
-                                 {% endif %}
-                                 {% endfor %}
-
+                                
             
                                 {% for price_list in price_lists %}
+                                <option value="{{ price_list.id }}" {% if customer_obj.price_list|stringformat:"s" == price_list.id|stringformat:"s" %} selected {% endif %}>{{ price_list.name }}</option>
 
-                                <option value="{{price_list.id}}">{{price_list.name}}</option>
+
+                                <!-- <option value="{{price_list.id}}">{{price_list.name}}</option> -->
     
                                     
                                 {% endfor %}
@@ -843,7 +900,31 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
+<!-- jQuery script to compare values and show alert -->
+<script>
+   $(document).ready(function() {
+    // Attach event listener to input fields
+    $('#opa, #cl').on('input', function() {
+        // Get values of the input fields
+        var openingBal = parseFloat($('#opa').val());
+        var creditLimit = parseFloat($('#cl').val());
 
+        // Check if credit limit is greater than opening balance amount
+        if (creditLimit > openingBal) {
+            // Show custom alert
+            $('#custom-alert').fadeIn();
+
+            // Clear the value of #cl
+            $('#cl').val('');
+        }
+    });
+
+    // Close custom alert when close button is clicked
+    $('.close-btn').on('click', function() {
+        $('#custom-alert').fadeOut();
+    });
+});
+</script>
 
 <script>
 

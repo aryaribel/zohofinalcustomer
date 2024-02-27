@@ -696,7 +696,7 @@ def customer(request):
         allmodules= ZohoModules.objects.get(company=dash_details,status='New')
         
         comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
-        price_lists=PriceList.objects.filter(company=dash_details,type='Sales')
+        price_lists=PriceList.objects.filter(company=dash_details,type='Sales',status='Active')
 
        
         return render(request,'zohomodules/customer/create_customer.html',{'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details,'price_lists':price_lists}) 
@@ -1386,14 +1386,7 @@ def customer_shareemail(request,pk):
 
 
 def Customer_edit(request,pk):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        if 'login_id' not in request.session:
-            return redirect('/')
-    log_details= LoginDetails.objects.get(id=log_id)
-
    
-
     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
@@ -1412,22 +1405,24 @@ def Customer_edit(request,pk):
 
         customer_obj=Customer.objects.get(id=pk)
 
-    customer_contact_obj=CustomerContactPersons.objects.filter(customer=customer_obj)  
-    comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
-    price_lists=PriceList.objects.filter(company=dash_details,type='Sales')
-   
-    content = {
-            'details': dash_details,
-            'allmodules': allmodules,
-            'customer_obj':customer_obj,
-            'log_details':log_details,
-            'customer_contact_obj':customer_contact_obj,
-            'comp_payment_terms':comp_payment_terms,
-            'price_lists': price_lists,
-    }
-   
+        customer_contact_obj=CustomerContactPersons.objects.filter(customer=customer_obj)  
+        comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
+        price_lists=PriceList.objects.filter(company=dash_details,type='Sales',status='Active')
+    
+        content = {
+                'details': dash_details,
+                'allmodules': allmodules,
+                'customer_obj':customer_obj,
+                'log_details':log_details,
+                'customer_contact_obj':customer_contact_obj,
+                'comp_payment_terms':comp_payment_terms,
+                'price_lists': price_lists,
+        }
+    
 
-    return render(request,'zohomodules/customer/edit_customer.html',content)
+        return render(request,'zohomodules/customer/edit_customer.html',content)
+    else:
+            return redirect('/')
 
 def do_customer_edit(request,pk):
      if 'login_id' in request.session:
