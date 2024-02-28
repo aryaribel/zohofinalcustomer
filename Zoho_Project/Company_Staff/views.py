@@ -889,7 +889,7 @@ def check_customer_phonenumber_exist(request):
        if mPhone:
           
             exists = Customer.objects.filter(
-                    mobile=mPhone
+                    customer_mobile=mPhone
                 ).exists()
             return JsonResponse({'exists': exists})          
     else:
@@ -902,7 +902,7 @@ def check_customer_work_phone_exist(request):
        if wPhone:
           
             exists = Customer.objects.filter(
-                    phone=wPhone
+                    customer_phone=wPhone
                 ).exists()
             return JsonResponse({'exists': exists})          
     else:
@@ -915,7 +915,7 @@ def check_customer_email_exist(request):
        if vendoremail:
           
             exists = Customer.objects.filter(
-                    vendor_email=vendoremail
+                    customer_email=vendoremail
                 ).exists()
             return JsonResponse({'exists': exists})          
     else:
@@ -997,7 +997,7 @@ def check_customer_term_exist(request):
 def customer_check_pan(request):
     if request.method == 'POST':
         panNumber = request.POST.get('panNumber')
-        pan_exists = Customer.objects.filter(pan_number=panNumber).exists()
+        pan_exists = Customer.objects.filter(PAN_number=panNumber).exists()
 
         if pan_exists:
             return JsonResponse({'status': 'exists'})
@@ -1009,7 +1009,7 @@ def customer_check_pan(request):
 def customer_check_gst(request):
     if request.method == 'POST':
         gstNumber = request.POST.get('gstNumber')
-        gst_exists = Customer.objects.filter(gst_number=gstNumber).exists()
+        gst_exists = Customer.objects.filter(GST_number=gstNumber).exists()
        
         if gst_exists:
             return JsonResponse({'status': 'exists'})
@@ -1107,21 +1107,35 @@ def import_customer_excel(request):
                 for row_number1 in range(2, eb.max_row + 1):
                             
                     vendorsheet = [eb.cell(row=row_number1, column=col_num).value for col_num in range(1, eb.max_column + 1)]
-                    comp_term=vendorsheet[16]
-                    pay_tm = add_space_before_first_digit(comp_term)
+                    comp_term=vendorsheet[18]
+                    if comp_term:
+                        normalized_data = comp_term.replace(" ", "")
+
+                        pay_tm = add_space_before_first_digit(normalized_data)
+                    else:
+                        cpt =Company_Payment_Term.objects.filter(company=dash_details).first()
+                        pay_tm = cpt.term_name
+   
                     try:
                         com_term_obj=Company_Payment_Term.objects.get(company=dash_details,term_name=pay_tm)
                     except Company_Payment_Term.DoesNotExist:
                         com_term_obj= None
-                    opn_blc_str = vendorsheet[15]  # Assuming vendorsheet[15] is a string representing a decimal
-                    opn_blc = Decimal(opn_blc_str)
-                    Vendor_object=Customer(title=vendorsheet[0],first_name=vendorsheet[1],last_name=vendorsheet[2],company_name=vendorsheet[3],vendor_email=vendorsheet[4],phone=vendorsheet[5],mobile=vendorsheet[6],skype_name_number=vendorsheet[7],designation=vendorsheet[8],department=vendorsheet[9],website=vendorsheet[10],
-                                         gst_treatment=vendorsheet[11],source_of_supply=vendorsheet[12],currency=vendorsheet[13],opening_balance_type=vendorsheet[14],
-                                         opening_balance=opn_blc,company_payment_terms=com_term_obj,billing_attention=vendorsheet[17],billing_address=vendorsheet[18],
-                                         billing_city=vendorsheet[19],billing_state=vendorsheet[20],billing_country=vendorsheet[21],billing_pin_code=vendorsheet[22],
-                                         billing_phone=vendorsheet[23],billing_fax=vendorsheet[24],shipping_attention=vendorsheet[25],shipping_address=vendorsheet[26],shipping_city=vendorsheet[27],
-                                         shipping_state=vendorsheet[28],shipping_country=vendorsheet[29],shipping_pin_code=vendorsheet[30],
-                                         shipping_phone=vendorsheet[31], shipping_fax=vendorsheet[32], remarks=vendorsheet[33],vendor_status="Active",company=dash_details,login_details=log_details)
+                    
+                    opn_blc_str = vendorsheet[17]  # Assuming vendorsheet[15] is a string representing a decimal
+                    if opn_blc_str:
+
+                        opn_blc = float(opn_blc_str)
+                    else:
+                        opn_blc = 0.00    
+                    
+
+                    Vendor_object=Customer(customer_type=vendorsheet[0],title=vendorsheet[1],first_name=vendorsheet[2],last_name=vendorsheet[3],company_name=vendorsheet[4],customer_email=vendorsheet[5],customer_phone=vendorsheet[6],customer_mobile=vendorsheet[7],skype=vendorsheet[8],designation=vendorsheet[9],department=vendorsheet[10],website=vendorsheet[11],
+                                         GST_treatement=vendorsheet[12],place_of_supply=vendorsheet[13],tax_preference=vendorsheet[14],currency=vendorsheet[15],opening_balance_type=vendorsheet[16],
+                                         opening_balance=opn_blc,company_payment_terms=com_term_obj,billing_attention=vendorsheet[19],billing_country=vendorsheet[20],billing_address=vendorsheet[21],
+                                         billing_city=vendorsheet[22],billing_state=vendorsheet[23],billing_pincode=vendorsheet[24],
+                                         billing_mobile=vendorsheet[25],billing_fax=vendorsheet[26],shipping_attention=vendorsheet[27],shipping_country=vendorsheet[28],shipping_address=vendorsheet[29],shipping_city=vendorsheet[30],
+                                         shipping_state=vendorsheet[31],shipping_pincode=vendorsheet[32],
+                                         shipping_mobile=vendorsheet[33], shipping_fax=vendorsheet[34], remarks=vendorsheet[35],current_balance=opn_blc,customer_status="Active",company=dash_details,login_details=log_details)
                     Vendor_object.save()
 
     
@@ -1458,9 +1472,10 @@ def do_customer_edit(request,pk):
             customer_data.customer_status="Active"
             customer_data.remarks=request.POST['remark']
             
-            cob=Decimal(request.POST['opening_bal'])
-            oc=Decimal(customer_data.current_balance) 
-            ob=Decimal(customer_data.opening_balance) 
+            cob=float(request.POST['opening_bal'])
+            oc=float(customer_data.current_balance) 
+            ob=float(customer_data.opening_balance) 
+
 
             if cob > ob:
                 diffadd=cob-ob
@@ -1596,4 +1611,6 @@ def do_customer_edit(request,pk):
                                 title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
                                 work_phone=ele[4],mobile=ele[5],skype_name_number=ele[6],designation=ele[7],department=ele[8],company=dash_details,customer=vendor
                             )
-            return redirect('view_customer_details',pk)                                               
+            return redirect('view_customer_details',pk)  
+
+#------------------------------------End----------------------------------------------#                                             

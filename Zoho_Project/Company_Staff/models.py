@@ -289,14 +289,14 @@ class Customer(models.Model):
 
     currency = models.CharField(max_length=220,null=True,blank=True)
     opening_balance_type = models.CharField(max_length=220,null=True,blank=True)
-    opening_balance = models.FloatField(null=True, blank=True)
+    opening_balance = models.FloatField(null=True, blank=True,default=0.00)
     credit_limit = models.FloatField(null=True, blank=True)
     price_list = models.CharField(max_length=220,null=True,blank=True)
     portal_language = models.CharField(max_length=220,null=True,blank=True)
 
     facebook = models.CharField(max_length=220,null=True,blank=True)
     twitter = models.CharField(max_length=220,null=True,blank=True)
-    current_balance = models.FloatField(null=True, blank=True)
+    current_balance = models.FloatField(null=True, blank=True,default=0.00)
 
     billing_attention = models.CharField(max_length=220,null=True,blank=True)
     billing_address = models.CharField(max_length=220,null=True,blank=True)
