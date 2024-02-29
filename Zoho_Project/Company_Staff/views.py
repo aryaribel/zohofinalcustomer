@@ -688,15 +688,18 @@ def customer(request):
     
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
         
-        comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
-        price_lists=PriceList.objects.filter(company=dash_details,type='Sales',status='Active')
+        comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
+        price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
 
        
         return render(request,'zohomodules/customer/create_customer.html',{'details':dash_details,'allmodules': allmodules,'comp_payment_terms':comp_payment_terms,'log_details':log_details,'price_lists':price_lists}) 
@@ -710,18 +713,20 @@ def view_customer_list(request):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
-
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
 
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')  
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
 
-        data=Customer.objects.filter(company=dash_details)
+        data=Customer.objects.filter(company=comp_details)
 
         
 
@@ -740,13 +745,18 @@ def add_customer(request):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
 
         
 
@@ -754,7 +764,7 @@ def add_customer(request):
         if request.method=="POST":
             customer_data=Customer()
             customer_data.login_details=log_details
-            customer_data.company=dash_details
+            customer_data.company=comp_details
             customer_data.customer_type = request.POST.get('type')
 
             customer_data.title = request.POST.get('salutation')
@@ -828,7 +838,7 @@ def add_customer(request):
            # ................ Adding to History table...........................
             
             vendor_history_obj=CustomerHistory()
-            vendor_history_obj.company=dash_details
+            vendor_history_obj.company=comp_details
             vendor_history_obj.login_details=log_details
             vendor_history_obj.customer=customer_data
             vendor_history_obj.date=date.today()
@@ -840,7 +850,7 @@ def add_customer(request):
             vendor=vdata
             rdata=Customer_remarks_table()
             rdata.remarks=request.POST['remark']
-            rdata.company=dash_details
+            rdata.company=comp_details
             rdata.customer=vdata
             rdata.save()
 
@@ -866,7 +876,7 @@ def add_customer(request):
                     print(mapped2)
                     for ele in mapped2:
                         created = CustomerContactPersons.objects.get_or_create(title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
-                                work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=dash_details,customer=vendor)
+                                work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor)
                 
         
             messages.success(request, 'Data saved successfully!')   
@@ -928,13 +938,19 @@ def customer_payment_terms_add(request):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
-            dash_details = CompanyDetails.objects.get(login_details=log_details)        
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+    
         if request.method == 'POST':
             terms = request.POST.get('name')
             day = request.POST.get('days')
@@ -942,7 +958,7 @@ def customer_payment_terms_add(request):
             pay_tm = add_space_before_first_digit(normalized_data)
             ptr = Company_Payment_Term(term_name=pay_tm, days=day, company=dash_details)
             ptr.save()
-            payterms_obj = Company_Payment_Term.objects.filter(company=dash_details).values('id', 'term_name')
+            payterms_obj = Company_Payment_Term.objects.filter(company=comp_details).values('id', 'term_name')
 
 
             payment_list = [{'id': pay_terms['id'], 'name': pay_terms['term_name']} for pay_terms in payterms_obj]
@@ -975,11 +991,16 @@ def check_customer_term_exist(request):
     
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
 
     if request.method == 'GET':
        term_name = request.GET.get('term_name', None)
@@ -988,7 +1009,7 @@ def check_customer_term_exist(request):
             term_name_processed = add_space_before_first_digit(normalized_data)
             exists = Company_Payment_Term.objects.filter(
                     term_name=term_name_processed,
-                    company=dash_details
+                    company=comp_details
                 ).exists()
             return JsonResponse({'exists': exists})          
     else:
@@ -1019,85 +1040,127 @@ def customer_check_gst(request):
         return JsonResponse({'error': 'Invalid request'}) 
 
 def sort_customer_by_name(request):
-    if 'login_id' in request.session:
+     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
-        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
   
         data=Customer.objects.filter(login_details=log_details).order_by('first_name')
         return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
-    else:
+     else:
             return redirect('/')    
 
 def sort_customer_by_amount(request):
-    if 'login_id' in request.session:
+     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
-        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-   
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
         data=Customer.objects.filter(login_details=log_details).order_by('opening_balance')
         return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
-    else:
+     else:
          return redirect('/')   
 
 
 def view_customer_active(request):
-    if 'login_id' in request.session:
+     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
-        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-   
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
         data=Customer.objects.filter(login_details=log_details,customer_status='Active').order_by('-id')
         return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
-    else:
+     else:
          return redirect('/') 
 
     
     
 def view_customer_inactive(request):
+     if 'login_id' in request.session:
+        if request.session.has_key('login_id'):
+            log_id = request.session['login_id']
+           
+        else:
+            return redirect('/')
+    
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
+        data=Customer.objects.filter(login_details=log_details,customer_status='Inactive').order_by('-id')
+        return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
+     else:
+         return redirect('/') 
+
+
+def import_customer_excel(request):
     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
-        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-   
-        data=Customer.objects.filter(login_details=log_details,customer_status='Inactive').order_by('-id')
-        return render(request,'zohomodules/customer/customer_list.html',{'data':data,'dash_details':dash_details})
-    else:
-         return redirect('/') 
-
-
-def import_customer_excel(request):
-   if 'login_id' in request.session:
-        if request.session.has_key('login_id'):
-            log_id = request.session['login_id']
-           
-        else:
-            return redirect('/')
-        log_details= LoginDetails.objects.get(id=log_id)
-
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
-            
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
         if request.method == 'POST' :
        
             if 'empfile' in request.FILES:
@@ -1113,11 +1176,11 @@ def import_customer_excel(request):
 
                         pay_tm = add_space_before_first_digit(normalized_data)
                     else:
-                        cpt =Company_Payment_Term.objects.filter(company=dash_details).first()
+                        cpt =Company_Payment_Term.objects.filter(company=comp_details).first()
                         pay_tm = cpt.term_name
    
                     try:
-                        com_term_obj=Company_Payment_Term.objects.get(company=dash_details,term_name=pay_tm)
+                        com_term_obj=Company_Payment_Term.objects.get(company=comp_details,term_name=pay_tm)
                     except Company_Payment_Term.DoesNotExist:
                         com_term_obj= None
                     
@@ -1135,7 +1198,7 @@ def import_customer_excel(request):
                                          billing_city=vendorsheet[22],billing_state=vendorsheet[23],billing_pincode=vendorsheet[24],
                                          billing_mobile=vendorsheet[25],billing_fax=vendorsheet[26],shipping_attention=vendorsheet[27],shipping_country=vendorsheet[28],shipping_address=vendorsheet[29],shipping_city=vendorsheet[30],
                                          shipping_state=vendorsheet[31],shipping_pincode=vendorsheet[32],
-                                         shipping_mobile=vendorsheet[33], shipping_fax=vendorsheet[34], remarks=vendorsheet[35],current_balance=opn_blc,customer_status="Active",company=dash_details,login_details=log_details)
+                                         shipping_mobile=vendorsheet[33], shipping_fax=vendorsheet[34], remarks=vendorsheet[35],current_balance=opn_blc,customer_status="Active",company=comp_details,login_details=log_details)
                     Vendor_object.save()
 
     
@@ -1157,19 +1220,24 @@ def view_customer_details(request,pk):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
 
         vendor_obj=Customer.objects.get(id=pk)
 
         # Getting all vendor to disply on the left side of vendor_detailsnew page
-        vendor_objs=Customer.objects.filter(company=dash_details)
+        vendor_objs=Customer.objects.filter(company=comp_details)
 
         vendor_comments=Customer_comments_table.objects.filter(customer=vendor_obj)
         vendor_history=CustomerHistory.objects.filter(customer=vendor_obj)
@@ -1193,25 +1261,29 @@ def sort_customer(request,selectId,pk):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
-
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
 
         vendor_obj = Customer.objects.get(id=pk)
-        vendor_objs = Customer.objects.filter(company=dash_details)
+        vendor_objs = Customer.objects.filter(company=comp_details)
 
         if selectId == 0:
-            vendor_objs=Customer.objects.filter(company=dash_details)
+            vendor_objs=Customer.objects.filter(company=comp_details)
         if selectId == 1:
-            vendor_objs=Customer.objects.filter(company=dash_details).order_by('first_name')
+            vendor_objs=Customer.objects.filter(company=comp_details).order_by('first_name')
         if selectId == 2:
-            vendor_objs=Customer.objects.filter(company=dash_details).order_by('opening_balance')
+            vendor_objs=Customer.objects.filter(company=comp_details).order_by('opening_balance')
            
         
         vendor_comments=Customer_comments_table.objects.filter(customer=vendor_obj)
@@ -1235,25 +1307,30 @@ def customer_status_change(request,statusId,pk):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
-
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
+    
 
         vendor_obj = Customer.objects.get(id=pk)
-        vendor_objs = Customer.objects.filter(company=dash_details)
+        vendor_objs = Customer.objects.filter(company=comp_details)
 
         if statusId == 0:
-            vendor_objs=Customer.objects.filter(company=dash_details)
+            vendor_objs=Customer.objects.filter(company=comp_details)
         if statusId == 1:
-            vendor_objs=Customer.objects.filter(company=dash_details,customer_status='Active').order_by('-id')
+            vendor_objs=Customer.objects.filter(company=comp_details,customer_status='Active').order_by('-id')
         if statusId == 2:
-            vendor_objs=Customer.objects.filter(company=dash_details,customer_status='Inactive').order_by('-id')
+            vendor_objs=Customer.objects.filter(company=comp_details,customer_status='Inactive').order_by('-id')
            
         
         vendor_comments=Customer_comments_table.objects.filter(customer=vendor_obj)
@@ -1289,20 +1366,25 @@ def customer_status(request,pk):
     return redirect('view_customer_details',pk)         
 
 def customer_add_comment(request,pk):
-    if 'login_id' in request.session:
+   if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
-  
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
         if request.method =='POST':
             comment_data=request.POST['comments']
        
@@ -1310,12 +1392,12 @@ def customer_add_comment(request,pk):
             vendor_obj=Customer_comments_table()
             vendor_obj.comment=comment_data
             vendor_obj.customer=vendor_id
-            vendor_obj.company=dash_details
+            vendor_obj.company=comp_details
             vendor_obj.login_details= LoginDetails.objects.get(id=log_id)
 
             vendor_obj.save()
             return redirect('view_customer_details',pk)
-    return redirect('view_customer_details',pk) 
+   return redirect('view_customer_details',pk) 
 
 
 def customer_delete_comment(request, pk):
@@ -1334,13 +1416,20 @@ def add_customer_file(request,pk):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+   
+
         if request.method == 'POST':
             data=request.FILES.getlist('file')
             try:
@@ -1350,7 +1439,7 @@ def add_customer_file(request,pk):
                     
                     vendor_obj.document = doc
                     vendor_obj.login_details = log_details
-                    vendor_obj.company = dash_details
+                    vendor_obj.company = comp_details
                     vendor_obj.customer = Customer.objects.get(id=pk)
                     vendor_obj.save()
                 
@@ -1366,13 +1455,19 @@ def customer_shareemail(request,pk):
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+    
     
         vendor_obj=Customer.objects.get(id=pk)
 
@@ -1401,27 +1496,30 @@ def customer_shareemail(request,pk):
 
 def Customer_edit(request,pk):
    
-    if 'login_id' in request.session:
+     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
 
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New') 
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
 
         customer_obj=Customer.objects.get(id=pk)
 
         customer_contact_obj=CustomerContactPersons.objects.filter(customer=customer_obj)  
-        comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
-        price_lists=PriceList.objects.filter(company=dash_details,type='Sales',status='Active')
+        comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
+        price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
     
         content = {
                 'details': dash_details,
@@ -1435,27 +1533,34 @@ def Customer_edit(request,pk):
     
 
         return render(request,'zohomodules/customer/edit_customer.html',content)
-    else:
+     else:
             return redirect('/')
 
 def do_customer_edit(request,pk):
-     if 'login_id' in request.session:
+         
+    if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
         else:
             return redirect('/')
+    
         log_details= LoginDetails.objects.get(id=log_id)
         if log_details.user_type=='Staff':
-            staff_details=StaffDetails.objects.get(login_details=log_details)
-            dash_details = CompanyDetails.objects.get(id=staff_details.company.id)
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
 
         else:    
             dash_details = CompanyDetails.objects.get(login_details=log_details)
+            comp_details=CompanyDetails.objects.get(login_details=log_details)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+    
         if request.method=="POST":
             customer_data=Customer.objects.get(id=pk)
             customer_data.login_details=log_details
-            customer_data.company=dash_details
+            customer_data.company=comp_details
             customer_data.title = request.POST.get('salutation')
             customer_data.first_name=request.POST['first_name']
             customer_data.last_name=request.POST['last_name']
@@ -1546,7 +1651,7 @@ def do_customer_edit(request,pk):
               # ................ Adding to History table...........................
             
             vendor_history_obj=CustomerHistory()
-            vendor_history_obj.company=dash_details
+            vendor_history_obj.company=comp_details
             vendor_history_obj.login_details=log_details
             vendor_history_obj.customer=customer_data
             vendor_history_obj.date=date.today()
@@ -1558,13 +1663,13 @@ def do_customer_edit(request,pk):
 
                 rdata=Customer_remarks_table.objects.get(customer=vdata)
                 rdata.remarks=request.POST['remark']
-                rdata.company=dash_details
+                rdata.company=comp_details
                 rdata.customer=vdata
                 rdata.save()
             except Customer_remarks_table.DoesNotExist:
                 remarks_obj= Customer_remarks_table()   
                 remarks_obj.remarks=request.POST['remark']
-                remarks_obj.company=dash_details
+                remarks_obj.company=comp_details
                 remarks_obj.customer=vdata
                 remarks_obj.save()
 
@@ -1589,7 +1694,7 @@ def do_customer_edit(request,pk):
                     mapped2=list(mapped2)
                     for ele in mapped2:
                        
-                        existing_instance = CustomerContactPersons.objects.filter(id=ele[9], company=dash_details, customer=vendor).first()
+                        existing_instance = CustomerContactPersons.objects.filter(id=ele[9], company=comp_details, customer=vendor).first()
                         if existing_instance:
                             # Update the existing instance
                             existing_instance.title = ele[0]
@@ -1609,7 +1714,7 @@ def do_customer_edit(request,pk):
                             # Create a new instance
                             new_instance = CustomerContactPersons.objects.create(
                                 title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
-                                work_phone=ele[4],mobile=ele[5],skype_name_number=ele[6],designation=ele[7],department=ele[8],company=dash_details,customer=vendor
+                                work_phone=ele[4],mobile=ele[5],skype_name_number=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor
                             )
             return redirect('view_customer_details',pk)  
 

@@ -706,6 +706,8 @@
                                         <th >Skype Name/No</th>
                                         <th >Designation</th>
                                         <th >Department</th>
+                                        <th>Action</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -737,6 +739,7 @@
                                     <td><input type="number" class="form-control border-1 bg-transparent text-white"  onclick="sample()" name="skype[]" /></td>
                                     <td><input type="text" class="form-control border-1 bg-transparent text-white"  name="designation[]" /></td>
                                     <td><input type="text" class="form-control border-1 bg-transparent text-white"  name="department[]" /></td>
+                                    <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
                                     </tr>
                                 </tbody>
                                 </table>
@@ -870,6 +873,26 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function deleteContact(button) {
+        var row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    document.querySelector('.add_another').addEventListener('click', function() {
+        var table = document.getElementById('tbl').getElementsByTagName('tbody')[1];
+        var newRow = table.insertRow(table.rows.length);
+
+        for (var i = 1; i < 9; i++) {
+            var cell = newRow.insertCell(i);
+            cell.innerHTML = '<input type="text" class="form-control border-1 bg-transparent text-white" name="dynamic[]">';
+        }
+
+        var deleteCell = newRow.insertCell(9);
+        deleteCell.innerHTML = '<button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button>';
+    });
+</script>
 
 <!-- jQuery script to compare values and show alert -->
 <script>
@@ -1148,6 +1171,7 @@ function updateOutputFields() {
             <td>
                 <input type="text" name="department[]" class="form-control border-1 bg-transparent text-white" value="" />
             </td>
+            <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
         </tr>`);
         });
       })

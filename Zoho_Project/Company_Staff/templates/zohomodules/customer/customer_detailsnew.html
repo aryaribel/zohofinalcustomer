@@ -176,16 +176,18 @@
                       <tr class="clickable-row" data-href="{% url 'view_customer_details' vendor_in.id %}">
 
                         <td>
-                          <div class="row">
+                          <div class="row" style="height: 50px;">
                             <div class="col-md-6">
                               <h6 style="color: rgb(241, 240, 240);">{{vendor_in.first_name}} {{vendor_in.last_name}}</h6>
+                              <p>{{vendor_in.customer_email}}</p>
+
                             </div>
                             <div class="col-md-6 " style="text-align: right;">&#x20B9; {{ vendor_in.opening_balance }}
+
                               <p>{{vendor_in.customer_status}}</p>
 
                             </div>
                           </div>
-                          <p>{{vendor_in.customer_email}}</p>
 
                         </td>
 
@@ -549,7 +551,7 @@
                           <h6 class="text-dark text-uppercase py-2">TRANSACTIONS</h6>
                           <table class="transaction_table table text-dark border mb-4" id="myTable"
                             style="border-collapse: collapse;">
-                            <thead style="border: 1px solid black;">
+                            <thead style="border: 1px solid black; background-color: #383838; color: white;">
                               <tr style="border: 1px solid black;">
 
                                 <th>Transactions</th>
