@@ -306,7 +306,7 @@
 
 
                     <div class="form-group row mt-4">
-                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Source Of Supply*</label>
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Source of Supply*</label>
                         
                         <div class=" col-sm-12 col-md-3 col-lg-3">
                             <select name="source_supply" id="PLACE" class="form-control bg-light text-dark">
@@ -402,7 +402,7 @@
                         <div class=" col-sm-12 col-md-3 col-lg-3">
                             <select name="currency" id="PLACE" class="form-control bg-light text-dark">
                                 <option value="Indian Rupee" selected>Indian Rupee</option>
-                                <option value="Indian Rupee">Indian Rupee</option>
+                                <!-- <option value="Indian Rupee">Indian Rupee</option> -->
                     
                             </select>
                         </div>
@@ -510,7 +510,7 @@
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" >Price List </label>
                          
                         <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="plst" id="PLACE" class="form-control bg-light text-dark">
+                            <select name="plst" id="PLACE" class="form-control bg-light text-dark" required>
                                 
             
                                 {% for price_list in price_lists %}

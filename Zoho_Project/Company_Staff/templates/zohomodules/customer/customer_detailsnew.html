@@ -263,15 +263,7 @@
                           data-toggle="tooltip" title="history">
                           <i class="fa-solid fa-clock-rotate-left"></i>
                         </a>
-                        <!-- <a class="btn btn-outline-warning dropdown-toggle btn-sm" href="#" role="button" title="share"
-                          id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <i class="fa-solid fa-share-nodes"></i>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                          <a class="dropdown-item" href="#" data-toggle="modal" title="upload" data-target="#commentModal4"
-                            data-toggle="tooltip" title="comment">Mail</a>
-                          <a class="dropdown-item" href="#" onclick="shareViaWhatsApp()">whatsapp</a>
-                        </div> -->
+                        
 
                     </div>
                     <div id="transation-icons" style="display: none;">
@@ -289,8 +281,12 @@
                         <i class="fa-solid fa-share-nodes"></i>
                       </a>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <a class="dropdown-item" href="#" data-toggle="modal" title="upload" data-target="#commentModal4"
-                          data-toggle="tooltip" title="comment">Mail</a>
+                        <!-- <li style="color: black;"> -->
+                          <a href="#" class="dropdown-item custom-li" data-toggle="modal" data-target="#shareToEmail">Mail</a>
+                      <!-- </li> -->
+                        <!-- <a class="dropdown-item" href="#" data-toggle="modal" title="upload" data-target="#commentModal4"
+                          data-toggle="tooltip" title="comment">Mail</a> -->
+
                         <a class="dropdown-item" href="#" onclick="shareViaWhatsApp()">whatsapp</a>
                       </div>
                     </div>
@@ -723,30 +719,75 @@
               </div>
             </div>
             <!-------------------------------------------------------------------------------------------------------->
-            <div class="modal fade" id="commentModal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-              aria-hidden="true" style="margin-top: 8vh;">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content" style="background-color: #3b3b3b;">
-                  <div class="modal-header">
-                    <h3 class="modal-title text-light" id="exampleModalLabel">Share details</h3>
-                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true" style="font-size: x-large;">&times;</span>
-                    </button>
+          
+
+            <div class="modal fade" id="shareToEmail" tabindex="-1" aria-labelledby="shareToEmailLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content bg-dark" >
+                  <div class="modal-header" style="border-bottom: 1px solid #ffffff;">
+                    <h5 class="modal-title text-white" id="shareToEmailLabel">Share Via Email</h5>
+                    <button type="button" class="text-white btn" data-bs-dismiss="modal" aria-label=""><i class="fa fa-close text-white m-0"></i></button>
                   </div>
-                  <form action="{% url 'customer_shareemail' vendor_obj.id %}" method="POST"
-                    enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                      <input type="email" name="email" required style="color:white;" class="form-control">
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-outline-warning">Share</button>
-                    </div>
-                  </form>
+                  <div class="modal-body">
+                    <form action="{% url 'customer_shareemail' vendor_obj.id %}" method="post" class="needs-validation" id="share_to_email_form">
+                      {% csrf_token %}
+                      <div class="form-group">
+                          <label for="emailIds" style="color: white;">Email IDs</label>
+                          <textarea class="form-control"  name="email_ids" id="emailIds" rows="3" style="height: 100px;color: white;" placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                      </div>
+                      <div class="form-group mt-2">
+                          <label for="item_unitname" style="color: white;">Message(optional)</label>
+                          <textarea name="email_message" id="email_message" class="form-control " cols="" rows="4" style="height: 100px;color: white;" placeholder="Message sended"></textarea>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffffff;">
+                    <button type="submit" id="share_with_email" class="submitShareEmailBtn btn btn-outline-warning w-50 text-uppercase">SEND MAIL</button>
+                  </div>
                 </div>
               </div>
-            </div>
+          </div>
+          <script>
+                $(document).ready(function(){
+                  $('#share_with_email').on('click',function(){
+                      var emailsInput = document.getElementById('emailIds');
+                      var emailsString = emailsInput.value.trim();
+          
+                      var emails = emailsString.split(',').map(function(email) {
+                          return email.trim();
+                      });
+          
+                      var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+          
+                      var invalidEmails = []
+                      if(emailsString == ""){
+                          alert('Enter valid email addresses..')
+                      }
+                      else{
+                          for (var i = 0; i < emails.length; i++) {
+                              var currentEmail = emails[i];
+          
+                              if (currentEmail!="" && !emailRegex.test(currentEmail)) {
+                                  console.log(currentEmail + ' is invalid!');
+                                  invalidEmails.push(currentEmail)
+                              }
+                          }
+                          
+                          if(invalidEmails.length > 0){
+                              alert('Invalid emails..Please check!\n'+invalidEmails)
+                              // alert(invalidEmails)
+                          }else{
+                              $('#share_to_email_form').submit();
+                          }
+                      }
+                  })
+              });
+          </script>
+
+
+
+
+
 
             <!----------------------------------------------------------end--------------------------------->
 

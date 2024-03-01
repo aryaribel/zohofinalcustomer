@@ -28,6 +28,7 @@ from django.http import JsonResponse,HttpResponse,HttpResponseRedirect
 from decimal import Decimal
 from django.http import HttpResponseNotFound, JsonResponse
 
+from django.core.mail import EmailMultiAlternatives
 
 
 # -------------------------------Company section--------------------------------
@@ -1448,8 +1449,11 @@ def add_customer_file(request,pk):
             except Customer_doc_upload_table.DoesNotExist:
                 return redirect('view_customer_details',pk) 
 
+ 
+            
+
 def customer_shareemail(request,pk):
-    if 'login_id' in request.session:
+     if 'login_id' in request.session:
         if request.session.has_key('login_id'):
             log_id = request.session['login_id']
            
@@ -1472,26 +1476,42 @@ def customer_shareemail(request,pk):
         vendor_obj=Customer.objects.get(id=pk)
 
         context = {'vendor_obj':vendor_obj,'details':dash_details}
+        if request.method == 'POST':
+            try:
+                emails_string = request.POST['email_ids']
 
-        emails_string = request.POST['email']
-        cemail = [email.strip() for email in emails_string.split(',')]
-        template_path = 'zohomodules/customer/customermailoverview.html'
-        template = get_template(template_path)
-        html  = template.render(context)
-        
-        result = BytesIO()
-        pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
-        pdf = result.getvalue()
-        filename = f'Transactions.pdf'
-        subject = f"Transaction Details"
-        
-        email = EmailMessage(subject, f"Hi,\nPlease find the attached transaction details {vendor_obj.first_name} {vendor_obj.last_name}.\n", to=cemail)
-        email.from_email = settings.EMAIL_HOST_USER  # Set the 'from' address separately
-        email.attach(filename, pdf, "application/pdf")
-        email.send(fail_silently=False)
+                        # Split the string by commas and remove any leading or trailing whitespace
+                emails_list = [email.strip() for email in emails_string.split(',')]
+                email_message = request.POST['email_message']
+                                                                                          
+                template_path = 'zohomodules/customer/customermailoverview.html'
+                template = get_template(template_path)
 
-        messages.success(request, 'Transaction has been shared via email successfully..!')
-        return redirect('view_customer_details',pk)  
+                html  = template.render(context)
+                result = BytesIO()
+                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
+                pdf = result.getvalue()
+                subject = f"Transaction Details"
+                email = f"Hi,\nPlease find the attached transaction details {vendor_obj.first_name} {vendor_obj.last_name}.\n"
+                email_from = settings.EMAIL_HOST_USER
+
+        
+                msg = EmailMultiAlternatives(subject, email, email_from, emails_list)
+                msg.attach(f'{vendor_obj.first_name}_{vendor_obj.last_name}_Transactions.pdf', pdf, "application/pdf")
+                
+                # Send the email
+                msg.send()
+
+                messages.success(request, 'Transaction has been shared via email successfully..!')
+                return redirect('view_customer_details',pk)
+
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                messages.error(request, 'An error occurred while sending the email. Please try again later.')
+                return redirect('view_customer_details',pk)
+
+
+
 
 
 def Customer_edit(request,pk):
