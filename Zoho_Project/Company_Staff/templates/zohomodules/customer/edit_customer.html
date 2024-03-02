@@ -72,7 +72,7 @@
             <h3  class="mb-4 mt-2  " style="font-size: 1.40rem;color: rgb(230, 171, 45);">New Customer</h3>
             
            
-            <form  method="post" action="{% url 'do_customer_edit' customer_obj.id %}"  enctype="multipart/form-data" class="mb-3">
+            <form  method="post" action="{% url 'do_customer_edit' customer_obj.id %}"  enctype="multipart/form-data" class="mb-3" id="customerForm">
                 {% csrf_token %}
         
                
@@ -510,14 +510,14 @@
                         <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" >Price List </label>
                          
                         <div class=" col-sm-12 col-md-3 col-lg-3">
-                            <select name="plst" id="PLACE" class="form-control bg-light text-dark" required>
-                                
+                            <select name="plst" id="PLACE" class="form-control bg-light text-dark">
+                                                                <option value="{{price_list.id}}">{{price_list.name}}</option>
+
             
                                 {% for price_list in price_lists %}
-                                <option value="{{ price_list.id }}" {% if customer_obj.price_list|stringformat:"s" == price_list.id|stringformat:"s" %} selected {% endif %}>{{ price_list.name }}</option>
+                                <option value="{{ price_list.id }}" {% if customer_obj.price_list|stringformat:"s" == price_list.id|stringformat:"s" %} selected {% else %} value="0" {% endif %}>{{ price_list.name }}</option>
 
 
-                                <!-- <option value="{{price_list.id}}">{{price_list.name}}</option> -->
     
                                     
                                 {% endfor %}
@@ -814,7 +814,7 @@
                 
                 <div class="row mt-5">
                     <div class="col-sm-12 col-md-2 col-lg-2 mt-3">
-                        <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;">Save</button>
+                        <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" id="submitBtn">Save</button>
                        
                     </div>
                     
@@ -871,7 +871,7 @@
                             <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="d-flex">
                                 <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
-                                type="submit" data-dismiss="modal" id="termSave">Save
+                                type="submit" data-dismiss="modal">Save
                                 </button> 
                                 
             
@@ -901,6 +901,36 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#submitBtn').click(function(e) {
+        e.preventDefault(); // Prevent the form from submitting initially
+        // Check if the address field is empty
+        var attention = $('#batten').val();
+
+        if (attention == 'null' || attention.trim() === '') {
+            alert('Please enter the attention');
+            return; // Prevent the form from submitting if address is empty
+        }
+
+        var attention = $('#batten').val();
+
+        if (attention == 'null' || attention.trim() === '') {
+            alert('Please enter the attention');
+            return; // Prevent the form from submitting if address is empty
+        }
+
+
+        
+        // If address is not empty, allow form submission
+        $('#customerForm').submit();
+    });
+});
+</script> -->
+
 
 
 

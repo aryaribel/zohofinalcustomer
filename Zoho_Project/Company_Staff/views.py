@@ -803,8 +803,23 @@ def add_customer(request):
     
             customer_data.opening_balance=request.POST['opening_bal']
             customer_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
-            customer_data.price_list=request.POST['plst']
-            customer_data.portal_language=request.POST['plang']
+            # customer_data.price_list=request.POST['plst']
+            plst=request.POST.get('plst')
+            if plst!=0:
+                 customer_data.price_list=plst
+            else:
+                customer_data.price_list='Price list not selected'
+
+
+
+
+            # customer_data.portal_language=request.POST['plang']
+            plang=request.POST.get('plang')
+            if plang!=0:
+                 customer_data.portal_language=plang
+            else:
+                customer_data.portal_language='Portal language not selected'
+
             customer_data.facebook=request.POST['fbk']
             customer_data.twitter=request.POST['twtr']
             customer_data.tax_preference=request.POST['tax1']
@@ -880,7 +895,7 @@ def add_customer(request):
                                 work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor)
                 
         
-            messages.success(request, 'Data saved successfully!')   
+            messages.success(request, 'Customer created successfully!')   
 
             return redirect('view_customer_list')
         
@@ -1635,9 +1650,21 @@ def do_customer_edit(request,pk):
                 customer_data.opening_balance_type='Opening Balance not selected'
             customer_data.opening_balance=request.POST['opening_bal']
             customer_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
-            customer_data.price_list=request.POST['plst']
-            print(request.POST['plst'])
-            customer_data.portal_language=request.POST['plang']
+            plst=request.POST.get('plst')
+            if plst!=0:
+
+                 customer_data.price_list=plst
+            else:
+                customer_data.price_list='Price list not selected'
+
+
+            # customer_data.portal_language=request.POST['plang']
+            plang=request.POST.get('plang')
+            if plang!=0:
+                 customer_data.portal_language=plang
+            else:
+                customer_data.portal_language='Portal language not selected'
+
             customer_data.facebook=request.POST['fbk']
             customer_data.twitter=request.POST['twtr']
             customer_data.tax_preference=request.POST['tax1']
